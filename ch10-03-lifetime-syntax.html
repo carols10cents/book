@@ -221,11 +221,11 @@ most readers first get into problems with lifetimes is involving string slices,
 so we wanted to demonstrate the flexibility of taking string slices as
 arguments but the issues you might run into because string slices are
 references.
-<p>All of the <code>String</code>/string slice/string literal concepts here are covered
+All of the `String`/string slice/string literal concepts here are covered
 thoroughly in Chapter 4, which is why we put two back references here (above
 and below). If these topics are confusing you in this context, I'd be
-interested to know if rereading Chapter 4 clears up that confusion.</p>
-<p>/Carol --&gt;</p>
+interested to know if rereading Chapter 4 clears up that confusion.
+/Carol -->
 <p>Refer back to the &quot;String Slices as Arguments&quot; section of Chapter 4 for more
 discussion about why these are the arguments we want.</p>
 <p>If we try to implement the <code>longest</code> function as shown in Listing 10-20, it
@@ -556,7 +556,7 @@ would have been written like this:</p>
 were typing the same lifetime annotations over and over in particular
 situations. These situations were predictable and followed a few deterministic
 patterns. The Rust team then programmed these patterns into the Rust compiler's
-code, so that the borrow checker can infer the lifetimes in these situations
+code so that the borrow checker can infer the lifetimes in these situations
 without forcing the programmer to explicitly add the annotations.</p>
 <p>We mention this piece of Rust history because it's entirely possible that more
 deterministic patterns will emerge and be added to the compiler. In the future,

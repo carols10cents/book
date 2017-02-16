@@ -366,9 +366,13 @@ we specify that we're implementing methods on the type <code>Point&lt;T&gt;</cod
 <p>Another way to use generics in methods is with parameters and return types of
 the methods that don't have to be the same as the generic types in the type
 we're implementing methods on. Listing 10-10 has a struct <code>A&lt;T&gt;</code> that holds a
-value of type <code>Option&lt;T&gt;</code>. The method <code>some_if_i_am_some</code>, which is a little
-silly, takes a value of a different generic type <code>U</code>, and returns an
-<code>Option&lt;U&gt;</code> based on whether the value in the struct is <code>Some(T)</code> or <code>None</code>:</p>
+value of type <code>Option&lt;T&gt;</code>, and the struct <code>A</code> has one method defined on it,
+named <code>some_if_i_have_some</code>. This example is a little silly and not very useful,
+but will fit our purposes for demonstrating how generics in struct fields and
+method signatures interact.</p>
+<p>The method <code>some_if_i_have_some</code> takes a value of a different generic type <code>U</code>
+and returns an <code>Option&lt;U&gt;</code> based on whether the data in the <code>value</code> field of
+the struct is <code>Some(T)</code> or <code>None</code>:</p>
 <figure>
 <span class="filename">Filename: src/main.rs</span>
 <pre><code class="language-rust">struct A&lt;T&gt; {
@@ -376,7 +380,7 @@ silly, takes a value of a different generic type <code>U</code>, and returns an
 }
 
 impl&lt;T&gt; A&lt;T&gt; {
-    fn some_if_i_am_some&lt;U&gt;(&amp;self, other: U) -&gt; Option&lt;U&gt; {
+    fn some_if_i_have_some&lt;U&gt;(&amp;self, other: U) -&gt; Option&lt;U&gt; {
         match self.value {
             Some(_) =&gt; Some(other),
             None =&gt; None,
@@ -385,19 +389,19 @@ impl&lt;T&gt; A&lt;T&gt; {
 }
 
 fn main() {
-    let an_a_with_some = A { value: Some(true) };
-    let an_a_with_different_some = A { value: Some(3) };
-    let an_a_with_none: A&lt;i32&gt; = A { value: None };
+    let a1 = A { value: Some(true) };
+    let a2 = A { value: Some(3) };
+    let a3: A&lt;i32&gt; = A { value: None };
 
-    let result1 = an_a_with_some.some_if_i_am_some(false);
-    let result2 = an_a_with_different_some.some_if_i_am_some(false);
-    let result3 = an_a_with_none.some_if_i_am_some(false);
+    let result1 = a1.some_if_i_have_some(false);
+    let result2 = a2.some_if_i_have_some(false);
+    let result3 = a3.some_if_i_have_some(false);
     println!(&quot;These will both print Some(false): {:?}, {:?}&quot;, result1, result2);
     println!(&quot;This will print None: {:?}&quot;, result3);
 
-    let result4 = an_a_with_some.some_if_i_am_some(5);
-    let result5 = an_a_with_different_some.some_if_i_am_some(5);
-    let result6 = an_a_with_none.some_if_i_am_some(5);
+    let result4 = a1.some_if_i_have_some(5);
+    let result5 = a2.some_if_i_have_some(5);
+    let result6 = a3.some_if_i_have_some(5);
     println!(&quot;These will both print Some(5): {:?}, {:?}&quot;, result4, result5);
     println!(&quot;This will print None: {:?}&quot;, result6);
 }
@@ -411,15 +415,15 @@ definition</p>
 of methods can be different from the generic types in the struct that the
 methods are defined on. The instance of <code>A&lt;T&gt;</code> in the variable <code>an_a_with_some</code>
 has the concrete type <code>A&lt;bool&gt;</code>, since its <code>value</code> holds <code>Some(true)</code>, which is
-of type <code>Option&lt;bool&gt;</code>. We can call <code>some_if_i_am_some</code> on <code>an_a_with_some</code>
+of type <code>Option&lt;bool&gt;</code>. We can call <code>some_if_i_have_some</code> on <code>an_a_with_some</code>
 with <code>false</code>, so that <code>U</code> also happens to be type <code>bool</code>. We can also call
-<code>some_if_i_am_some</code> and pass <code>5</code>, which means <code>U</code> will be type <code>i32</code> and
+<code>some_if_i_have_some</code> and pass <code>5</code>, which means <code>U</code> will be type <code>i32</code> and
 different from <code>T</code> in that case. No matter what the type of <code>value</code> is for
-these instances of struct <code>A&lt;T&gt;</code>, the method <code>some_if_i_am_some</code> takes values
+these instances of struct <code>A&lt;T&gt;</code>, the method <code>some_if_i_have_some</code> takes values
 of a type that can be different than <code>T</code>, and its return type is the same as
 what was passed into the method.</p>
 <p>Note the place where we declared <code>U</code>: it's in the signature of the method after
-the name <code>some_if_i_am_some</code>, not in the <code>struct</code> definition or after <code>impl</code>,
+the name <code>some_if_i_have_some</code>, not in the <code>struct</code> definition or after <code>impl</code>,
 where we declared <code>T</code>. This reflects the fact that <code>U</code> is only used in the
 method and not in the struct fields.</p>
 <!-- Liz: I don't think we need to review or reference why `an_a_with_none`

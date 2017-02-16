@@ -132,6 +132,7 @@ is already limited to 140 characters.</p>
 pub struct NewsArticle {
     pub headline: String,
     pub location: String,
+    pub author: String,
     pub content: String,
 }
 
@@ -222,9 +223,12 @@ and <code>Vec</code> are defined in the standard library. We are allowed to impl
 standard library traits like <code>Display</code> on a custom type like <code>Tweet</code> as part of
 our <code>aggregator</code> crate functionality. We could also implement <code>Summarizable</code> on
 <code>Vec</code> in our <code>aggregator</code> crate, since we've defined <code>Summarizable</code> there. This
-restriction is part of what's called the <em>orphan rules</em>, which you can look up
-if you're interested in type theory. Briefly, [INSERT SENTENCE ABOUT WHY IT'S
-CALLED THE ORPHAN RULE AND WHY WE DON'T WANT ORPHAN IMPLEMENTATIONS HERE]</p>
+restriction is part of what's called the <em>orphan rule</em>, which you can look up
+if you're interested in type theory. Briefly, it's called the orphan rule
+because the parent type is not present. Without this rule, two crates could
+implement the same trait for the same type, and the two implementations would
+conflict: Rust wouldn't know which implementation to use. Because Rust enforces
+the orphan rule, other people's code can't break your code and vice versa.</p>
 <h3>Default Implementations</h3>
 <p>Sometimes it's useful to have default behavior for some or all of the methods
 in a trait, instead of making every implementation on every type define custom
@@ -258,6 +262,7 @@ still call the <code>summary</code> method on an instance of <code>NewsArticle</
 <pre><code class="language-rust,ignore">let article = NewsArticle {
     headline: String::from(&quot;Penguins win the Stanley Cup Championship!&quot;),
     location: String::from(&quot;Pittsburgh, PA, USA&quot;),
+    author: String::from(&quot;Iceburgh&quot;),
     content: String::from(&quot;The Pittsburgh Penguins once again are the best
     hockey team in the NHL.&quot;),
 };
@@ -314,11 +319,7 @@ the <code>summary</code> method on its parameter <code>item</code>, which is of 
 We can use trait bounds on <code>T</code> to specify that <code>item</code> can't be any concrete
 type; <code>item</code> can only be types that implement the <code>Summarizable</code> trait since we
 want to be able to call <code>summary</code> on <code>item</code> without getting an error:</p>
-<pre><code class="language-rust,ignore"># pub trait Summarizable {
-#     fn summary(&amp;self) -&gt; String;
-# }
-#
-pub fn notify&lt;T: Summarizable&gt;(item: T) {
+<pre><code class="language-rust,ignore">pub fn notify&lt;T: Summarizable&gt;(item: T) {
     println!(&quot;Breaking news! {}&quot;, item.summary());
 }
 </code></pre>
@@ -365,14 +366,13 @@ note: an implementation of `std::cmp::PartialOrd` might be missing for `T`
 <p>In the body of <code>largest</code> we wanted to be able to compare two values of type <code>T</code>
 using the greater-than operator. That operator is defined as a default method
 on the standard library trait <code>std::cmp::PartialOrd</code>. So in order to be able to
-use the greater-than operator, we need to bring <code>PartialOrd</code> into scope and
-specify it in the trait bounds for <code>T</code> so that the <code>largest</code> function will work
-on slices of any type that can be compared.</p>
-<pre><code class="language-rust,ignore">use std::cmp::PartialOrd;
-
-fn largest&lt;T: PartialOrd&gt;(list: &amp;[T]) -&gt; T {
+use the greater-than operator, we need to specify <code>PartialOrd</code> in the trait
+bounds for <code>T</code> so that the <code>largest</code> function will work on slices of any type
+that can be compared. We don't need to bring <code>PartialOrd</code> into scope because
+it's in the prelude.</p>
+<pre><code class="language-rust,ignore">fn largest&lt;T: PartialOrd&gt;(list: &amp;[T]) -&gt; T {
 </code></pre>
-<p>If we try to compile this, we'll get more errors:</p>
+<p>If we try to compile this, we'll get different errors:</p>
 <pre><code class="language-text">error[E0508]: cannot move out of type `[T]`, a non-copy array
  --&gt; src/main.rs:4:23
   |

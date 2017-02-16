@@ -7115,8 +7115,8 @@ can make use of them in your code.</p>
 code; in Rust, one of those tools is <em>generics</em>. Generics are abstract
 stand-ins for concrete types or other properties. We can express properties of
 generics, such as their behavior or how they relate to other generics, without
-needing to know when we're writing the code what will actually be in their
-place.</p>
+needing to know when we're writing and compiling the code what will actually be
+in their place.</p>
 <p>In the same way that a function takes parameters whose value we don't know in
 order to write code once that will be run on multiple concrete values, we can
 write functions that take parameters of some generic type instead of a concrete
@@ -7574,9 +7574,13 @@ we specify that we're implementing methods on the type <code>Point&lt;T&gt;</cod
 <p>Another way to use generics in methods is with parameters and return types of
 the methods that don't have to be the same as the generic types in the type
 we're implementing methods on. Listing 10-10 has a struct <code>A&lt;T&gt;</code> that holds a
-value of type <code>Option&lt;T&gt;</code>. The method <code>some_if_i_am_some</code>, which is a little
-silly, takes a value of a different generic type <code>U</code>, and returns an
-<code>Option&lt;U&gt;</code> based on whether the value in the struct is <code>Some(T)</code> or <code>None</code>:</p>
+value of type <code>Option&lt;T&gt;</code>, and the struct <code>A</code> has one method defined on it,
+named <code>some_if_i_have_some</code>. This example is a little silly and not very useful,
+but will fit our purposes for demonstrating how generics in struct fields and
+method signatures interact.</p>
+<p>The method <code>some_if_i_have_some</code> takes a value of a different generic type <code>U</code>
+and returns an <code>Option&lt;U&gt;</code> based on whether the data in the <code>value</code> field of
+the struct is <code>Some(T)</code> or <code>None</code>:</p>
 <figure>
 <span class="filename">Filename: src/main.rs</span>
 <pre><code class="language-rust">struct A&lt;T&gt; {
@@ -7584,7 +7588,7 @@ silly, takes a value of a different generic type <code>U</code>, and returns an
 }
 
 impl&lt;T&gt; A&lt;T&gt; {
-    fn some_if_i_am_some&lt;U&gt;(&amp;self, other: U) -&gt; Option&lt;U&gt; {
+    fn some_if_i_have_some&lt;U&gt;(&amp;self, other: U) -&gt; Option&lt;U&gt; {
         match self.value {
             Some(_) =&gt; Some(other),
             None =&gt; None,
@@ -7593,19 +7597,19 @@ impl&lt;T&gt; A&lt;T&gt; {
 }
 
 fn main() {
-    let an_a_with_some = A { value: Some(true) };
-    let an_a_with_different_some = A { value: Some(3) };
-    let an_a_with_none: A&lt;i32&gt; = A { value: None };
+    let a1 = A { value: Some(true) };
+    let a2 = A { value: Some(3) };
+    let a3: A&lt;i32&gt; = A { value: None };
 
-    let result1 = an_a_with_some.some_if_i_am_some(false);
-    let result2 = an_a_with_different_some.some_if_i_am_some(false);
-    let result3 = an_a_with_none.some_if_i_am_some(false);
+    let result1 = a1.some_if_i_have_some(false);
+    let result2 = a2.some_if_i_have_some(false);
+    let result3 = a3.some_if_i_have_some(false);
     println!(&quot;These will both print Some(false): {:?}, {:?}&quot;, result1, result2);
     println!(&quot;This will print None: {:?}&quot;, result3);
 
-    let result4 = an_a_with_some.some_if_i_am_some(5);
-    let result5 = an_a_with_different_some.some_if_i_am_some(5);
-    let result6 = an_a_with_none.some_if_i_am_some(5);
+    let result4 = a1.some_if_i_have_some(5);
+    let result5 = a2.some_if_i_have_some(5);
+    let result6 = a3.some_if_i_have_some(5);
     println!(&quot;These will both print Some(5): {:?}, {:?}&quot;, result4, result5);
     println!(&quot;This will print None: {:?}&quot;, result6);
 }
@@ -7619,15 +7623,15 @@ definition</p>
 of methods can be different from the generic types in the struct that the
 methods are defined on. The instance of <code>A&lt;T&gt;</code> in the variable <code>an_a_with_some</code>
 has the concrete type <code>A&lt;bool&gt;</code>, since its <code>value</code> holds <code>Some(true)</code>, which is
-of type <code>Option&lt;bool&gt;</code>. We can call <code>some_if_i_am_some</code> on <code>an_a_with_some</code>
+of type <code>Option&lt;bool&gt;</code>. We can call <code>some_if_i_have_some</code> on <code>an_a_with_some</code>
 with <code>false</code>, so that <code>U</code> also happens to be type <code>bool</code>. We can also call
-<code>some_if_i_am_some</code> and pass <code>5</code>, which means <code>U</code> will be type <code>i32</code> and
+<code>some_if_i_have_some</code> and pass <code>5</code>, which means <code>U</code> will be type <code>i32</code> and
 different from <code>T</code> in that case. No matter what the type of <code>value</code> is for
-these instances of struct <code>A&lt;T&gt;</code>, the method <code>some_if_i_am_some</code> takes values
+these instances of struct <code>A&lt;T&gt;</code>, the method <code>some_if_i_have_some</code> takes values
 of a type that can be different than <code>T</code>, and its return type is the same as
 what was passed into the method.</p>
 <p>Note the place where we declared <code>U</code>: it's in the signature of the method after
-the name <code>some_if_i_am_some</code>, not in the <code>struct</code> definition or after <code>impl</code>,
+the name <code>some_if_i_have_some</code>, not in the <code>struct</code> definition or after <code>impl</code>,
 where we declared <code>T</code>. This reflects the fact that <code>U</code> is only used in the
 method and not in the struct fields.</p>
 <!-- Liz: I don't think we need to review or reference why `an_a_with_none`
@@ -7745,6 +7749,7 @@ is already limited to 140 characters.</p>
 pub struct NewsArticle {
     pub headline: String,
     pub location: String,
+    pub author: String,
     pub content: String,
 }
 
@@ -7835,9 +7840,12 @@ and <code>Vec</code> are defined in the standard library. We are allowed to impl
 standard library traits like <code>Display</code> on a custom type like <code>Tweet</code> as part of
 our <code>aggregator</code> crate functionality. We could also implement <code>Summarizable</code> on
 <code>Vec</code> in our <code>aggregator</code> crate, since we've defined <code>Summarizable</code> there. This
-restriction is part of what's called the <em>orphan rules</em>, which you can look up
-if you're interested in type theory. Briefly, [INSERT SENTENCE ABOUT WHY IT'S
-CALLED THE ORPHAN RULE AND WHY WE DON'T WANT ORPHAN IMPLEMENTATIONS HERE]</p>
+restriction is part of what's called the <em>orphan rule</em>, which you can look up
+if you're interested in type theory. Briefly, it's called the orphan rule
+because the parent type is not present. Without this rule, two crates could
+implement the same trait for the same type, and the two implementations would
+conflict: Rust wouldn't know which implementation to use. Because Rust enforces
+the orphan rule, other people's code can't break your code and vice versa.</p>
 <h3>Default Implementations</h3>
 <p>Sometimes it's useful to have default behavior for some or all of the methods
 in a trait, instead of making every implementation on every type define custom
@@ -7871,6 +7879,7 @@ still call the <code>summary</code> method on an instance of <code>NewsArticle</
 <pre><code class="language-rust,ignore">let article = NewsArticle {
     headline: String::from(&quot;Penguins win the Stanley Cup Championship!&quot;),
     location: String::from(&quot;Pittsburgh, PA, USA&quot;),
+    author: String::from(&quot;Iceburgh&quot;),
     content: String::from(&quot;The Pittsburgh Penguins once again are the best
     hockey team in the NHL.&quot;),
 };
@@ -7927,11 +7936,7 @@ the <code>summary</code> method on its parameter <code>item</code>, which is of 
 We can use trait bounds on <code>T</code> to specify that <code>item</code> can't be any concrete
 type; <code>item</code> can only be types that implement the <code>Summarizable</code> trait since we
 want to be able to call <code>summary</code> on <code>item</code> without getting an error:</p>
-<pre><code class="language-rust,ignore"># pub trait Summarizable {
-#     fn summary(&amp;self) -&gt; String;
-# }
-#
-pub fn notify&lt;T: Summarizable&gt;(item: T) {
+<pre><code class="language-rust,ignore">pub fn notify&lt;T: Summarizable&gt;(item: T) {
     println!(&quot;Breaking news! {}&quot;, item.summary());
 }
 </code></pre>
@@ -7978,14 +7983,13 @@ note: an implementation of `std::cmp::PartialOrd` might be missing for `T`
 <p>In the body of <code>largest</code> we wanted to be able to compare two values of type <code>T</code>
 using the greater-than operator. That operator is defined as a default method
 on the standard library trait <code>std::cmp::PartialOrd</code>. So in order to be able to
-use the greater-than operator, we need to bring <code>PartialOrd</code> into scope and
-specify it in the trait bounds for <code>T</code> so that the <code>largest</code> function will work
-on slices of any type that can be compared.</p>
-<pre><code class="language-rust,ignore">use std::cmp::PartialOrd;
-
-fn largest&lt;T: PartialOrd&gt;(list: &amp;[T]) -&gt; T {
+use the greater-than operator, we need to specify <code>PartialOrd</code> in the trait
+bounds for <code>T</code> so that the <code>largest</code> function will work on slices of any type
+that can be compared. We don't need to bring <code>PartialOrd</code> into scope because
+it's in the prelude.</p>
+<pre><code class="language-rust,ignore">fn largest&lt;T: PartialOrd&gt;(list: &amp;[T]) -&gt; T {
 </code></pre>
-<p>If we try to compile this, we'll get more errors:</p>
+<p>If we try to compile this, we'll get different errors:</p>
 <pre><code class="language-text">error[E0508]: cannot move out of type `[T]`, a non-copy array
  --&gt; src/main.rs:4:23
   |
@@ -8229,11 +8233,11 @@ most readers first get into problems with lifetimes is involving string slices,
 so we wanted to demonstrate the flexibility of taking string slices as
 arguments but the issues you might run into because string slices are
 references.
-<p>All of the <code>String</code>/string slice/string literal concepts here are covered
+All of the `String`/string slice/string literal concepts here are covered
 thoroughly in Chapter 4, which is why we put two back references here (above
 and below). If these topics are confusing you in this context, I'd be
-interested to know if rereading Chapter 4 clears up that confusion.</p>
-<p>/Carol --&gt;</p>
+interested to know if rereading Chapter 4 clears up that confusion.
+/Carol -->
 <p>Refer back to the &quot;String Slices as Arguments&quot; section of Chapter 4 for more
 discussion about why these are the arguments we want.</p>
 <p>If we try to implement the <code>longest</code> function as shown in Listing 10-20, it
@@ -8564,7 +8568,7 @@ would have been written like this:</p>
 were typing the same lifetime annotations over and over in particular
 situations. These situations were predictable and followed a few deterministic
 patterns. The Rust team then programmed these patterns into the Rust compiler's
-code, so that the borrow checker can infer the lifetimes in these situations
+code so that the borrow checker can infer the lifetimes in these situations
 without forcing the programmer to explicitly add the annotations.</p>
 <p>We mention this piece of Rust history because it's entirely possible that more
 deterministic patterns will emerge and be added to the compiler. In the future,
