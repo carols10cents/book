@@ -7408,7 +7408,7 @@ note: an implementation of `std::cmp::PartialOrd` might be missing for `T`
 <p>The note mentions <code>std::cmp::PartialOrd</code>, which is a <em>trait</em>. We're going to
 talk about traits in the next section, but briefly, what this error is saying
 is that the body of <code>largest</code> won't work for all possible types that <code>T</code> could
-be: since we want to compare values of type <code>T</code> in the body, we can only use
+be; since we want to compare values of type <code>T</code> in the body, we can only use
 types that know how to be ordered. The standard library has defined the trait
 <code>std::cmp::PartialOrd</code> that types can implement to enable comparisons. We'll
 come back to traits and how to specify that a generic type has a particular
@@ -7510,9 +7510,9 @@ hard to read and understand. If you get to a point of needing lots of generic
 types, it's probably a sign that your code could use some restructuring to be
 separated into smaller pieces.</p>
 <h3>Using Generic Data Types in Enum Definitions</h3>
-<p>In a similar way as structs, enums can be defined to hold generic data types in
-their variants. We used the <code>Option&lt;T&gt;</code> enum provided by the standard library
-in Chapter 6, and now its definition should make more sense. Let's take another
+<p>Similarly to structs, enums can be defined to hold generic data types in their
+variants. We used the <code>Option&lt;T&gt;</code> enum provided by the standard library in
+Chapter 6, and now its definition should make more sense. Let's take another
 look:</p>
 <pre><code class="language-rust">enum Option&lt;T&gt; {
     Some(T),
@@ -7576,13 +7576,12 @@ will return a reference to the <code>x</code> field, which is of type <code>T</c
 </figure>
 <p>Note that we have to declare <code>T</code> just after <code>impl</code>, so that we can use it when
 we specify that we're implementing methods on the type <code>Point&lt;T&gt;</code>.</p>
-<p>Another way to use generics in methods is with parameters and return types of
-the methods that don't have to be the same as the generic types in the type
-we're implementing methods on. Listing 10-10 has a struct <code>A&lt;T&gt;</code> that holds a
-value of type <code>Option&lt;T&gt;</code>, and the struct <code>A</code> has one method defined on it,
-named <code>some_if_i_have_some</code>. This example is a little silly and not very useful,
-but will fit our purposes for demonstrating how generics in struct fields and
-method signatures interact.</p>
+<p>Generic type parameters in a struct definition aren't always the same generic
+type parameters you want to use in that struct's method signatures. Listing
+10-10 has a struct <code>A&lt;T&gt;</code> that holds a value of type <code>Option&lt;T&gt;</code>, and the
+struct <code>A</code> has one method defined on it, named <code>some_if_i_have_some</code>. This
+example is a little silly and not very useful, but will fit our purposes for
+demonstrating how generics in struct fields and method signatures interact.</p>
 <p>The method <code>some_if_i_have_some</code> takes a value of a different generic type <code>U</code>
 and returns an <code>Option&lt;U&gt;</code> based on whether the data in the <code>value</code> field of
 the struct is <code>Some(T)</code> or <code>None</code>:</p>
@@ -7639,11 +7638,11 @@ what was passed into the method.</p>
 the name <code>some_if_i_have_some</code>, not in the <code>struct</code> definition or after <code>impl</code>,
 where we declared <code>T</code>. This reflects the fact that <code>U</code> is only used in the
 method and not in the struct fields.</p>
-<!-- Liz: I don't think we need to review or reference why `an_a_with_none`
-needs a type annotation here since we covered that in the `Option` enum chapter
-of chapter 6, but I could be convinced we should have a reference, I guess.
-It's not the main focus of this example but needs to be there for this code to
-compile. /Carol -->
+<!-- Liz: I don't think we need to review or reference why `a3` needs a type
+annotation here since we covered that in the `Option` enum chapter of chapter
+6, but I could be convinced we should have a reference, I guess. It's not the
+main focus of this example but needs to be there for this code to compile.
+/Carol -->
 <h3>Performance of Code Using Generics</h3>
 <p>You may have been reading this section and wondering if there's a run-time cost
 to using generic type parameters. Good news: the way that Rust has implemented
