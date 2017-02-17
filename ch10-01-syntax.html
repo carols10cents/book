@@ -84,7 +84,7 @@ first function is the one we extracted in Listing 10-3 that finds the largest
 <code>i32</code> in a slice. The second function finds the largest <code>char</code> in a slice:</p>
 <figure>
 <span class="filename">Filename: src/main.rs</span>
-<pre><code class="language-rust">fn largest(list: &amp;[i32]) -&gt; i32 {
+<pre><code class="language-rust">fn largest_i32(list: &amp;[i32]) -&gt; i32 {
     let mut largest = list[0];
 
     for &amp;item in list.iter() {
@@ -111,7 +111,7 @@ fn largest_char(list: &amp;[char]) -&gt; char {
 fn main() {
     let numbers = vec![34, 50, 25, 100, 65];
 
-    let result = largest(&amp;numbers);
+    let result = largest_i32(&amp;numbers);
     println!(&quot;The largest number is {}&quot;, result);
 #    assert_eq!(result, 100);
 
@@ -123,12 +123,13 @@ fn main() {
 }
 </code></pre>
 <figcaption>
-<p>Listing 10-4: Two functions that differ only in the types in their signatures</p>
+<p>Listing 10-4: Two functions that differ only in their names and the types in
+their signatures</p>
 </figcaption>
 </figure>
-<p>Here, the functions <code>largest</code> and <code>largest_char</code> have the exact same body, so
-it would be nice if we could turn these two functions into one and get rid of
-the duplication. Luckily, we can do that by introducing a generic type
+<p>Here, the functions <code>largest_i32</code> and <code>largest_char</code> have the exact same body,
+so it would be nice if we could turn these two functions into one and get rid
+of the duplication. Luckily, we can do that by introducing a generic type
 parameter!</p>
 <p>To parameterize the types in the signature of the one function we're going to
 define, we need to create a name for the type parameter, just like how we give
@@ -193,14 +194,15 @@ parameters but doesn't compile yet</p>
   |
 note: an implementation of `std::cmp::PartialOrd` might be missing for `T`
 </code></pre>
-<p>The note mentions <code>std::cmp::PartialOrd</code>, which is a trait defined by the
-standard library that the operator <code>&gt;</code> uses. What this error is saying is that
-the body of <code>largest</code> won't work for all possible types that <code>T</code> could be:
-since we want to compare values of type <code>T</code> in the body, we can only use types
-that know how to be ordered, which is what the trait <code>std::cmp::PartialOrd</code>
-defines. We're going to come back to traits and how to specify that a generic
-type has a particular trait in the next section. Let's set this example aside
-for a moment and explore other places we can use generic type parameters first.</p>
+<p>The note mentions <code>std::cmp::PartialOrd</code>, which is a <em>trait</em>. We're going to
+talk about traits in the next section, but briefly, what this error is saying
+is that the body of <code>largest</code> won't work for all possible types that <code>T</code> could
+be: since we want to compare values of type <code>T</code> in the body, we can only use
+types that know how to be ordered. The standard library has defined the trait
+<code>std::cmp::PartialOrd</code> that types can implement to enable comparisons. We'll
+come back to traits and how to specify that a generic type has a particular
+trait in the next section, but let's set this example aside for a moment and
+explore other places we can use generic type parameters first.</p>
 <!-- Liz: this is the reason we had the topics in the order we did in the first
 draft of this chapter; it's hard to do anything interesting with generic types
 in functions unless you also know about traits and trait bounds. I think this

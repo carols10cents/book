@@ -7112,7 +7112,7 @@ the <code>Option</code> and <code>Result</code> enums, let's talk about how gene
 can make use of them in your code.</p>
 <h1>Generic Types, Traits, and Lifetimes</h1>
 <p>Every programming language has tools to deal effectively with duplication of
-code; in Rust, one of those tools is <em>generics</em>. Generics are abstract
+concepts; in Rust, one of those tools is <em>generics</em>. Generics are abstract
 stand-ins for concrete types or other properties. We can express properties of
 generics, such as their behavior or how they relate to other generics, without
 needing to know when we're writing and compiling the code what will actually be
@@ -7216,10 +7216,13 @@ we have multiple places to update the logic if we need to change it.</p>
 <!-- Yes, our audience will be familiar with this term. /Carol -->
 <p>To eliminate this duplication, we can create an abstraction, which in this case
 will be in the form of a function that operates on any list of integers given
-to the function in a parameter. In the program in Listing 10-3, we've extracted
-the code that finds the largest number into a function named <code>largest</code>. This
-program can find the largest number in two different lists of numbers, but the
-code from Listing 10-1 only exists in one spot:</p>
+to the function in a parameter. This will increase the clarity of our code and
+let us communicate and reason about the concept of finding the largest number
+in a list independently of the specific places this concept is used.</p>
+<p>In the program in Listing 10-3, we've extracted the code that finds the largest
+number into a function named <code>largest</code>. This program can find the largest
+number in two different lists of numbers, but the code from Listing 10-1 only
+exists in one spot:</p>
 <figure>
 <span class="filename">Filename: src/main.rs</span>
 <pre><code class="language-rust">fn largest(list: &amp;[i32]) -&gt; i32 {
@@ -7292,7 +7295,7 @@ first function is the one we extracted in Listing 10-3 that finds the largest
 <code>i32</code> in a slice. The second function finds the largest <code>char</code> in a slice:</p>
 <figure>
 <span class="filename">Filename: src/main.rs</span>
-<pre><code class="language-rust">fn largest(list: &amp;[i32]) -&gt; i32 {
+<pre><code class="language-rust">fn largest_i32(list: &amp;[i32]) -&gt; i32 {
     let mut largest = list[0];
 
     for &amp;item in list.iter() {
@@ -7319,7 +7322,7 @@ fn largest_char(list: &amp;[char]) -&gt; char {
 fn main() {
     let numbers = vec![34, 50, 25, 100, 65];
 
-    let result = largest(&amp;numbers);
+    let result = largest_i32(&amp;numbers);
     println!(&quot;The largest number is {}&quot;, result);
 #    assert_eq!(result, 100);
 
@@ -7331,12 +7334,13 @@ fn main() {
 }
 </code></pre>
 <figcaption>
-<p>Listing 10-4: Two functions that differ only in the types in their signatures</p>
+<p>Listing 10-4: Two functions that differ only in their names and the types in
+their signatures</p>
 </figcaption>
 </figure>
-<p>Here, the functions <code>largest</code> and <code>largest_char</code> have the exact same body, so
-it would be nice if we could turn these two functions into one and get rid of
-the duplication. Luckily, we can do that by introducing a generic type
+<p>Here, the functions <code>largest_i32</code> and <code>largest_char</code> have the exact same body,
+so it would be nice if we could turn these two functions into one and get rid
+of the duplication. Luckily, we can do that by introducing a generic type
 parameter!</p>
 <p>To parameterize the types in the signature of the one function we're going to
 define, we need to create a name for the type parameter, just like how we give
@@ -7401,14 +7405,15 @@ parameters but doesn't compile yet</p>
   |
 note: an implementation of `std::cmp::PartialOrd` might be missing for `T`
 </code></pre>
-<p>The note mentions <code>std::cmp::PartialOrd</code>, which is a trait defined by the
-standard library that the operator <code>&gt;</code> uses. What this error is saying is that
-the body of <code>largest</code> won't work for all possible types that <code>T</code> could be:
-since we want to compare values of type <code>T</code> in the body, we can only use types
-that know how to be ordered, which is what the trait <code>std::cmp::PartialOrd</code>
-defines. We're going to come back to traits and how to specify that a generic
-type has a particular trait in the next section. Let's set this example aside
-for a moment and explore other places we can use generic type parameters first.</p>
+<p>The note mentions <code>std::cmp::PartialOrd</code>, which is a <em>trait</em>. We're going to
+talk about traits in the next section, but briefly, what this error is saying
+is that the body of <code>largest</code> won't work for all possible types that <code>T</code> could
+be: since we want to compare values of type <code>T</code> in the body, we can only use
+types that know how to be ordered. The standard library has defined the trait
+<code>std::cmp::PartialOrd</code> that types can implement to enable comparisons. We'll
+come back to traits and how to specify that a generic type has a particular
+trait in the next section, but let's set this example aside for a moment and
+explore other places we can use generic type parameters first.</p>
 <!-- Liz: this is the reason we had the topics in the order we did in the first
 draft of this chapter; it's hard to do anything interesting with generic types
 in functions unless you also know about traits and trait bounds. I think this
@@ -8119,6 +8124,13 @@ the inner scope ends, and we attempt to print out the value in <code>r</code>:</
 <p>Listing 10-16: An attempt to use a reference whose value has gone out of scope</p>
 </figcaption>
 </figure>
+<blockquote>
+<h4>Uninitialized Variables Cannot Be Used</h4>
+<p>The next few examples declare variables without giving them an initial value,
+so that the variable name exists in the outer scope. This might appear to be
+in conflict with Rust not having null. However, if we try to use a variable
+before giving it a value, we'll get a compile-time error. Try it out!</p>
+</blockquote>
 <p>When we compile this code, we'll get an error:</p>
 <pre><code class="language-text">error: `x` does not live long enough
    |
@@ -8362,9 +8374,9 @@ guaranteed to be valid as long as the shorter of the lifetimes of <code>x</code>
 references that have different concrete lifetimes. Listing 10-22 is a
 straightforward example that should match your intuition from any language:
 <code>string1</code> is valid until the end of the outer scope, <code>string2</code> is valid until
-the end of the inner scope, and <code>result</code> is also valid until the end of the
-outer scope. The borrow checker approves of this code; it will compile and
-print <code>The longest string is long string is long</code> when run:</p>
+the end of the inner scope, and <code>result</code> references something that is valid
+until the end of the outer scope. The borrow checker approves of this code; it
+will compile and print <code>The longest string is long string is long</code> when run:</p>
 <figure>
 <span class="filename">Filename: src/main.rs</span>
 <pre><code class="language-rust"># fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
@@ -8450,7 +8462,7 @@ is used. Make hypotheses about whether your experiments will pass the borrow
 checker or not before you compile, then check to see if you're right!</p>
 <h3>Thinking in Terms of Lifetimes</h3>
 <p>The exact way to specify lifetime parameters depends on what your function is
-doing. For example, if we changed the implementation of the <code>largest</code> function
+doing. For example, if we changed the implementation of the <code>longest</code> function
 to always return the first argument rather than the longest string slice, we
 wouldn't need to specify a lifetime on the <code>y</code> parameter. This code compiles:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
@@ -8506,10 +8518,10 @@ would create dangling pointers or otherwise violate memory safety.</p>
 <p>Up until now, we've only defined structs to hold owned types. It is possible
 for structs to hold references, but we need to add a lifetime annotation on
 every reference in the struct's definition. Listing 10-24 has a struct named
-<code>Important</code> that holds a string slice:</p>
+<code>ImportantExcerpt</code> that holds a string slice:</p>
 <figure>
 <span class="filename">Filename: src/main.rs</span>
-<pre><code>struct Important&lt;'a&gt; {
+<pre><code class="language-rust">struct ImportantExcerpt&lt;'a&gt; {
     part: &amp;'a str,
 }
 
@@ -8518,7 +8530,7 @@ fn main() {
     let first_sentence = novel.split('.')
         .next()
         .expect(&quot;Could not find a '.'&quot;);
-    let i = Important { part: first_sentence };
+    let i = ImportantExcerpt { part: first_sentence };
 }
 </code></pre>
 <figcaption>
@@ -8531,9 +8543,9 @@ reference. Just like with generic data types, we have to declare the name of
 the generic lifetime parameter inside angle brackets after the name of the
 struct so that we can use the lifetime parameter in the body of the struct
 definition.</p>
-<p>The <code>main</code> function here creates an instance of the <code>Important</code> struct that
-holds a reference to the first sentence of the <code>String</code> owned by the variable
-<code>novel</code>.</p>
+<p>The <code>main</code> function here creates an instance of the <code>ImportantExcerpt</code> struct
+that holds a reference to the first sentence of the <code>String</code> owned by the
+variable <code>novel</code>.</p>
 <h3>Lifetime Elision</h3>
 <p>In this section, we've learned that every reference has a lifetime, and we need
 to specify lifetime parameters for functions or structs that use references.
@@ -8662,16 +8674,16 @@ keyword and then used after the struct's name, since those lifetimes are part
 of the struct's type.</p>
 <p>In method signatures inside the <code>impl</code> block, references might be tied to the
 lifetime of references in the struct's fields, or they might be independent. In
-addition, the third lifetime elision rule often makes it so that lifetime
-annotations aren't necessary in method signatures. Let's look at a few examples
-using the struct named <code>Important</code> that we defined in Listing 10-24.</p>
+addition, the lifetime elision rules often make it so that lifetime annotations
+aren't necessary in method signatures. Let's look at some examples using the
+struct named <code>ImportantExcerpt</code> that we defined in Listing 10-24.</p>
 <p>First, here's a method named <code>level</code>. The only parameter is a reference to
 <code>self</code>, and the return value is just an <code>i32</code>, not a reference to anything:</p>
-<pre><code class="language-rust"># struct Important&lt;'a&gt; {
+<pre><code class="language-rust"># struct ImportantExcerpt&lt;'a&gt; {
 #     part: &amp;'a str,
 # }
 #
-impl&lt;'a&gt; Important&lt;'a&gt; {
+impl&lt;'a&gt; ImportantExcerpt&lt;'a&gt; {
     fn level(&amp;self) -&gt; i32 {
         3
     }
@@ -8680,39 +8692,22 @@ impl&lt;'a&gt; Important&lt;'a&gt; {
 <p>The lifetime parameter declaration after <code>impl</code> and use after the type name is
 required, but we're not required to annotate the lifetime of the reference to
 <code>self</code> because of the first elision rule.</p>
-<p>Next up is a method named <code>first_word_of_part</code> that also borrows <code>self</code> but
-returns a string slice:</p>
-<pre><code class="language-rust"># struct Important&lt;'a&gt; {
+<p>Here's an example where the third lifetime elision rule applies:</p>
+<pre><code class="language-rust"># struct ImportantExcerpt&lt;'a&gt; {
 #     part: &amp;'a str,
 # }
 #
-impl&lt;'a&gt; Important&lt;'a&gt; {
-    fn first_word_of_part(&amp;self) -&gt; &amp;str {
-        self.part.split_whitespace()
-            .next()
-            .expect(&quot;Could not find the first word of the important part&quot;)
-    }
-}
-</code></pre>
-<p>The <code>first_word_of_part</code> method also doesn't need explicit lifetimes, because
-of rule 2: the only input parameter is <code>&amp;self</code>, so the lifetime of <code>&amp;self</code> is
-used for the lifetime of the returned <code>&amp;str</code> too.</p>
-<p>Here's an example where rule 3 applies:</p>
-<pre><code class="language-rust"># struct Important&lt;'a&gt; {
-#     part: &amp;'a str,
-# }
-#
-impl&lt;'a&gt; Important&lt;'a&gt; {
+impl&lt;'a&gt; ImportantExcerpt&lt;'a&gt; {
     fn announce_and_return_part(&amp;self, announcement: &amp;str) -&gt; &amp;str {
         println!(&quot;Attention please: {}&quot;, announcement);
         self.part
     }
 }
 </code></pre>
-<p>There are two input lifetimes, so Rust applies rule 1 and gives both <code>&amp;self</code>
-and <code>announcement</code> their own lifetimes. Then, because one of the parameters is
-<code>&amp;self</code>, the return type gets the lifetime of <code>&amp;self</code>, and all lifetimes have
-been accounted for.</p>
+<p>There are two input lifetimes, so Rust applies the first lifetime elision rule
+and gives both <code>&amp;self</code> and <code>announcement</code> their own lifetimes. Then, because
+one of the parameters is <code>&amp;self</code>, the return type gets the lifetime of <code>&amp;self</code>,
+and all lifetimes have been accounted for.</p>
 <h3>The Static Lifetime</h3>
 <p>There is <em>one</em> special lifetime we need to discuss: <code>'static</code>. The <code>'static</code>
 lifetime is the entire duration of the program. All string literals have the

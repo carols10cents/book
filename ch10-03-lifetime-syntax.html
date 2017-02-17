@@ -107,6 +107,13 @@ the inner scope ends, and we attempt to print out the value in <code>r</code>:</
 <p>Listing 10-16: An attempt to use a reference whose value has gone out of scope</p>
 </figcaption>
 </figure>
+<blockquote>
+<h4>Uninitialized Variables Cannot Be Used</h4>
+<p>The next few examples declare variables without giving them an initial value,
+so that the variable name exists in the outer scope. This might appear to be
+in conflict with Rust not having null. However, if we try to use a variable
+before giving it a value, we'll get a compile-time error. Try it out!</p>
+</blockquote>
 <p>When we compile this code, we'll get an error:</p>
 <pre><code class="language-text">error: `x` does not live long enough
    |
@@ -350,9 +357,9 @@ guaranteed to be valid as long as the shorter of the lifetimes of <code>x</code>
 references that have different concrete lifetimes. Listing 10-22 is a
 straightforward example that should match your intuition from any language:
 <code>string1</code> is valid until the end of the outer scope, <code>string2</code> is valid until
-the end of the inner scope, and <code>result</code> is also valid until the end of the
-outer scope. The borrow checker approves of this code; it will compile and
-print <code>The longest string is long string is long</code> when run:</p>
+the end of the inner scope, and <code>result</code> references something that is valid
+until the end of the outer scope. The borrow checker approves of this code; it
+will compile and print <code>The longest string is long string is long</code> when run:</p>
 <figure>
 <span class="filename">Filename: src/main.rs</span>
 <pre><code class="language-rust"># fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
@@ -438,7 +445,7 @@ is used. Make hypotheses about whether your experiments will pass the borrow
 checker or not before you compile, then check to see if you're right!</p>
 <h3>Thinking in Terms of Lifetimes</h3>
 <p>The exact way to specify lifetime parameters depends on what your function is
-doing. For example, if we changed the implementation of the <code>largest</code> function
+doing. For example, if we changed the implementation of the <code>longest</code> function
 to always return the first argument rather than the longest string slice, we
 wouldn't need to specify a lifetime on the <code>y</code> parameter. This code compiles:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
@@ -494,10 +501,10 @@ would create dangling pointers or otherwise violate memory safety.</p>
 <p>Up until now, we've only defined structs to hold owned types. It is possible
 for structs to hold references, but we need to add a lifetime annotation on
 every reference in the struct's definition. Listing 10-24 has a struct named
-<code>Important</code> that holds a string slice:</p>
+<code>ImportantExcerpt</code> that holds a string slice:</p>
 <figure>
 <span class="filename">Filename: src/main.rs</span>
-<pre><code>struct Important&lt;'a&gt; {
+<pre><code class="language-rust">struct ImportantExcerpt&lt;'a&gt; {
     part: &amp;'a str,
 }
 
@@ -506,7 +513,7 @@ fn main() {
     let first_sentence = novel.split('.')
         .next()
         .expect(&quot;Could not find a '.'&quot;);
-    let i = Important { part: first_sentence };
+    let i = ImportantExcerpt { part: first_sentence };
 }
 </code></pre>
 <figcaption>
@@ -519,9 +526,9 @@ reference. Just like with generic data types, we have to declare the name of
 the generic lifetime parameter inside angle brackets after the name of the
 struct so that we can use the lifetime parameter in the body of the struct
 definition.</p>
-<p>The <code>main</code> function here creates an instance of the <code>Important</code> struct that
-holds a reference to the first sentence of the <code>String</code> owned by the variable
-<code>novel</code>.</p>
+<p>The <code>main</code> function here creates an instance of the <code>ImportantExcerpt</code> struct
+that holds a reference to the first sentence of the <code>String</code> owned by the
+variable <code>novel</code>.</p>
 <h3>Lifetime Elision</h3>
 <p>In this section, we've learned that every reference has a lifetime, and we need
 to specify lifetime parameters for functions or structs that use references.
@@ -650,16 +657,16 @@ keyword and then used after the struct's name, since those lifetimes are part
 of the struct's type.</p>
 <p>In method signatures inside the <code>impl</code> block, references might be tied to the
 lifetime of references in the struct's fields, or they might be independent. In
-addition, the third lifetime elision rule often makes it so that lifetime
-annotations aren't necessary in method signatures. Let's look at a few examples
-using the struct named <code>Important</code> that we defined in Listing 10-24.</p>
+addition, the lifetime elision rules often make it so that lifetime annotations
+aren't necessary in method signatures. Let's look at some examples using the
+struct named <code>ImportantExcerpt</code> that we defined in Listing 10-24.</p>
 <p>First, here's a method named <code>level</code>. The only parameter is a reference to
 <code>self</code>, and the return value is just an <code>i32</code>, not a reference to anything:</p>
-<pre><code class="language-rust"># struct Important&lt;'a&gt; {
+<pre><code class="language-rust"># struct ImportantExcerpt&lt;'a&gt; {
 #     part: &amp;'a str,
 # }
 #
-impl&lt;'a&gt; Important&lt;'a&gt; {
+impl&lt;'a&gt; ImportantExcerpt&lt;'a&gt; {
     fn level(&amp;self) -&gt; i32 {
         3
     }
@@ -668,39 +675,22 @@ impl&lt;'a&gt; Important&lt;'a&gt; {
 <p>The lifetime parameter declaration after <code>impl</code> and use after the type name is
 required, but we're not required to annotate the lifetime of the reference to
 <code>self</code> because of the first elision rule.</p>
-<p>Next up is a method named <code>first_word_of_part</code> that also borrows <code>self</code> but
-returns a string slice:</p>
-<pre><code class="language-rust"># struct Important&lt;'a&gt; {
+<p>Here's an example where the third lifetime elision rule applies:</p>
+<pre><code class="language-rust"># struct ImportantExcerpt&lt;'a&gt; {
 #     part: &amp;'a str,
 # }
 #
-impl&lt;'a&gt; Important&lt;'a&gt; {
-    fn first_word_of_part(&amp;self) -&gt; &amp;str {
-        self.part.split_whitespace()
-            .next()
-            .expect(&quot;Could not find the first word of the important part&quot;)
-    }
-}
-</code></pre>
-<p>The <code>first_word_of_part</code> method also doesn't need explicit lifetimes, because
-of rule 2: the only input parameter is <code>&amp;self</code>, so the lifetime of <code>&amp;self</code> is
-used for the lifetime of the returned <code>&amp;str</code> too.</p>
-<p>Here's an example where rule 3 applies:</p>
-<pre><code class="language-rust"># struct Important&lt;'a&gt; {
-#     part: &amp;'a str,
-# }
-#
-impl&lt;'a&gt; Important&lt;'a&gt; {
+impl&lt;'a&gt; ImportantExcerpt&lt;'a&gt; {
     fn announce_and_return_part(&amp;self, announcement: &amp;str) -&gt; &amp;str {
         println!(&quot;Attention please: {}&quot;, announcement);
         self.part
     }
 }
 </code></pre>
-<p>There are two input lifetimes, so Rust applies rule 1 and gives both <code>&amp;self</code>
-and <code>announcement</code> their own lifetimes. Then, because one of the parameters is
-<code>&amp;self</code>, the return type gets the lifetime of <code>&amp;self</code>, and all lifetimes have
-been accounted for.</p>
+<p>There are two input lifetimes, so Rust applies the first lifetime elision rule
+and gives both <code>&amp;self</code> and <code>announcement</code> their own lifetimes. Then, because
+one of the parameters is <code>&amp;self</code>, the return type gets the lifetime of <code>&amp;self</code>,
+and all lifetimes have been accounted for.</p>
 <h3>The Static Lifetime</h3>
 <p>There is <em>one</em> special lifetime we need to discuss: <code>'static</code>. The <code>'static</code>
 lifetime is the entire duration of the program. All string literals have the
