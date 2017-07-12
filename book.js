@@ -33,6 +33,7 @@ $( document ).ready(function() {
     };
 
     $(document).on('keydown', function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) { return; }
         switch (e.keyCode) {
             case KEY_CODES.NEXT_KEY:
                 e.preventDefault();
@@ -54,20 +55,6 @@ $( document ).ready(function() {
     var sidebar = $("#sidebar");
     var page_wrapper = $("#page-wrapper");
     var content = $("#content");
-
-
-    // Add anchors for all content headers
-    content.find("h1, h2, h3, h4, h5").wrap(function(){
-        var wrapper = $("<a class=\"header\">");
-        var header_name = $(this).text().trim().replace(/\W/g, '-')
-        wrapper.attr("name", header_name);
-        // Add so that when you click the link actually shows up in the url bar...
-        // Remove any existing anchor then append the new one
-        // ensuring eg. no spaces are present within it ie. they become %20
-        wrapper.attr("href", $(location).attr('href').split("#")[0] + "#" + header_name );
-        return wrapper;
-    });
-
 
     // Toggle sidebar
     $("#sidebar-toggle").click(function(event){
@@ -221,6 +208,18 @@ function run_rust_code(code_block) {
         result_block = code_block.find(".result");
     }
 
+    let text = code_block.find(".language-rust").text();
+
+    let params = {
+        version: "stable",
+        optimize: "0",
+        code: text,
+    };
+
+    if(text.includes("#![feature")) {
+        params.version = "nightly";
+    }
+
     result_block.text("Running...");
 
     $.ajax({
@@ -229,7 +228,7 @@ function run_rust_code(code_block) {
         crossDomain: true,
         dataType: "json",
         contentType: "application/json",
-        data: JSON.stringify({version: "stable", optimize: "0", code: code_block.find(".language-rust").text() }),
+        data: JSON.stringify(params),
         success: function(response){
             result_block.text(response.result);
         }
