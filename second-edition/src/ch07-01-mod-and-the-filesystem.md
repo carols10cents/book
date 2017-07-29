@@ -1,4 +1,4 @@
-## `mod` and the Filesystem
+## Modules and the Filesystem
 
 We’ll start our module example by making a new project with Cargo, but instead
 of creating a binary crate, we’ll make a library crate: a project that other
@@ -48,63 +48,51 @@ suitable in a variety of situations, depending on the intent of the code.
 
 ### Module Definitions
 
+> NOTE FOR THIS EXPERIMENT: I'm assuming we'll want to introduce
+> files/directories as modules first, rather than inline modules, since modules
+> as files/directories will be the more common case. The old book started with
+> inline and moved the inline modules to files to attempt to build up a mental
+> model that wouldn't be valid with the proposed module system.
+
 For our `communicator` networking library, we’ll first define a module named
-`network` that contains the definition of a function called `connect`. Every
-module definition in Rust starts with the `mod` keyword. Add this code to the
-beginning of the *src/lib.rs* file, above the test code:
+`network` that contains the definition of a function called `connect`. Create a
+file named *network.rs* with the contents shown in Listing 7-1:
 
-<span class="filename">Filename: src/lib.rs</span>
+<span class="filename">Filename: network.rs</span>
 
 ```rust
-mod network {
-    fn connect() {
-    }
+fn connect() {
 }
 ```
 
-After the `mod` keyword, we put the name of the module, `network`, and then a
-block of code in curly braces. Everything inside this block is inside the
-namespace `network`. In this case, we have a single function, `connect`. If we
-wanted to call this function from a script outside the `network` module, we
-would need to specify the module and use the namespace syntax `::`, like so:
-`network::connect()` rather than just `connect()`.
+<span class="caption">Listing 7-1: A `network` module that contains a `connect`
+function</span>
 
-We can also have multiple modules, side by side, in the same *src/lib.rs* file.
-For example, to also have a `client` module that has a function named `connect`
-as well, we can add it as shown in Listing 7-1:
+Everything in this file is inside the namespace `network`. In this case, we
+have a single function, `connect`. If we wanted to call this function from a
+script outside the `network` module, we would need to specify the module and
+use the namespace syntax `::`, like so: `network::connect()` rather than just
+`connect()`.
 
-<span class="filename">Filename: src/lib.rs</span>
+Namespaces provided by modules are useful since it means we can have multiple
+functions use the same name, as long as they're in different namespaces. For
+example, we can create a file named *src/client.rs* that has the same contents
+as shown in Listing 7-1. Now we have a `network::connect` function and a
+`client::connect` function. These can have completely different functionality,
+and the function names do not conflict with each other because they’re in
+different modules.
 
-```rust
-mod network {
-    fn connect() {
-    }
-}
+We can put modules inside of modules by creating directories in *src* and then
+putting Rust files within those directories. Multiple levels of modules can be
+useful as your modules grow to keep related functionality organized together
+and separate functionality apart. The choice of how you organize your code
+depends on how you think about the relationship between the parts of your code.
+For instance, the `client` code and its `connect` function might make more
+sense to users of our library if they were inside the `network` namespace
+instead. To do that, create a *network* directory and move the *src/client.rs*
+file into *src/network/client.rs*
 
-mod client {
-    fn connect() {
-    }
-}
-```
-
-<span class="caption">Listing 7-1: The `network` module and the `client` module
-defined side-by-side in *src/lib.rs*</span>
-
-Now we have a `network::connect` function and a `client::connect` function.
-These can have completely different functionality, and the function names do
-not conflict with each other because they’re in different modules.
-
-In this case, because we’re building a library, the file that serves as the
-entry point for building our library is *src/lib.rs*. However, in respect to
-creating modules, there’s nothing special about *src/lib.rs*. We could also
-create modules in *src/main.rs* for a binary crate in the same way as we’re
-creating modules in *src/lib.rs* for the library crate. In fact, we can put
-modules inside of modules, which can be useful as your modules grow to keep
-related functionality organized together and separate functionality apart. The
-choice of how you organize your code depends on how you think about the
-relationship between the parts of your code. For instance, the `client` code
-and its `connect` function might make more sense to users of our library if
-they were inside the `network` namespace instead, as in Listing 7-2:
+> NOTE: What happens to src/network.rs? I'm confused now :(
 
 <span class="filename">Filename: src/lib.rs</span>
 
