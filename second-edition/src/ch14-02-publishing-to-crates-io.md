@@ -179,17 +179,16 @@ Documentation comments within items are useful for describing crates and
 modules especially. Use them to talk about the purpose of the container overall
 to help users of your crate understand your organization.
 
-### Exporting a Convenient Public API with `pub use`
+### Exporting a Convenient External API with `export`
 
-In Chapter 7, we covered how to organize our code into modules with the `mod`
-keyword, how to make items public with the `pub` keyword, and how to bring
-items into a scope with the `use` keyword. The structure that makes sense to
-you while you’re developing a crate may not be very convenient for your users,
-however. You may wish to organize your structs in a hierarchy containing
-multiple levels, but people that want to use a type you’ve defined deep in the
-hierarchy might have trouble finding out that those types exist. They might
-also be annoyed at having to type `use
-my_crate::some_module::another_module::UsefulType;` rather than `use
+In Chapter 7, we covered how to organize our code into modules, how to export
+items with the `export` keyword, and how to bring items into a scope with the
+`use` keyword. The structure that makes sense to you while you’re developing a
+crate may not be very convenient for your users, however. You may wish to
+organize your structs in a hierarchy containing multiple levels, but people
+that want to use a type you’ve defined deep in the hierarchy might have trouble
+finding out that those types exist. They might also be annoyed at having to
+type `use my_crate::some_module::another_module::UsefulType;` rather than `use
 my_crate::UsefulType;`.
 
 <!-- Can you outline why, briefly, here? Reading on, is it something like:
@@ -204,10 +203,10 @@ hierarchy is large.
 
 The good news is that, if the structure *isn’t* convenient for others to use
 from another library, you don’t have to rearrange your internal organization:
-you can choose to re-export items to make a public structure that’s different
-to your private structure, using `pub use`. Re-exporting takes a public item in
-one location and makes it public in another location as if it was defined in
-the other location instead.
+you can choose to re-export items to make an external structure that’s
+different to your internal structure, using `export`. Re-exporting takes an
+exported item in one location and exports it in another location as if it was
+defined in the other location instead.
 
 <!-- Can you give a quick definition of "re-export" here? -->
 <!-- Yup! /Carol -->
@@ -224,28 +223,28 @@ named `mix` as shown in Listing 14-6:
 //!
 //! A library for modeling artistic concepts.
 
-pub mod kinds {
+export mod kinds {
     /// The primary colors according to the RYB color model.
-    pub enum PrimaryColor {
+    export enum PrimaryColor {
         Red,
         Yellow,
         Blue,
     }
 
     /// The secondary colors according to the RYB color model.
-    pub enum SecondaryColor {
+    export enum SecondaryColor {
         Orange,
         Green,
         Purple,
     }
 }
 
-pub mod utils {
+export mod utils {
     use kinds::*;
 
     /// Combines two primary colors in equal amounts to create
     /// a secondary color.
-    pub fn mix(c1: PrimaryColor, c2: PrimaryColor) -> SecondaryColor {
+    export fn mix(c1: PrimaryColor, c2: PrimaryColor) -> SecondaryColor {
         // ...snip...
 #        SecondaryColor::Green
     }
@@ -275,8 +274,6 @@ and `mix` items from the `art` crate:
 <span class="filename">Filename: src/main.rs</span>
 
 ```rust,ignore
-extern crate art;
-
 use art::kinds::PrimaryColor;
 use art::utils::mix;
 
@@ -317,20 +314,20 @@ items at the top level, as shown in Listing 14-9:
 //!
 //! A library for modeling artistic concepts.
 
-pub use kinds::PrimaryColor;
-pub use kinds::SecondaryColor;
-pub use utils::mix;
+export kinds::PrimaryColor;
+export kinds::SecondaryColor;
+export utils::mix;
 
-pub mod kinds {
+export mod kinds {
     // ...snip...
 }
 
-pub mod utils {
+export mod utils {
     // ...snip...
 }
 ```
 
-<span class="caption">Listing 14-9: Adding `pub use` statements to re-export
+<span class="caption">Listing 14-9: Adding `export` statements to re-export
 items</span>
 
 <!-- Will add ghosting in libreoffice /Carol -->
@@ -351,8 +348,6 @@ as in Listing 14-8, or they can use the more convenient structure from Listing
 <span class="filename">Filename: src/main.rs</span>
 
 ```rust,ignore
-extern crate art;
-
 use art::PrimaryColor;
 use art::mix;
 
@@ -367,15 +362,15 @@ the `art` crate</span>
 <!-- Will add ghosting in libreoffice /Carol -->
 
 In cases where there are many nested modules, re-exporting the types at the top
-level with `pub use` can make a big difference in the experience of people who
+level with `export` can make a big difference in the experience of people who
 use the crate.
 
-Creating a useful public API structure is more of an art than a science, and
-you can iterate to find the API that works best for your users. Choosing `pub
-use` gives you flexibility in how you structure your crate internally, and
+Creating a useful external API structure is more of an art than a science, and
+you can iterate to find the API that works best for your users. Choosing
+`export` gives you flexibility in how you structure your crate internally, and
 decouples that internal structure with what you present to your users. Take a
 look at some of the code of crates you’ve installed to see if their internal
-structure differs from their public API.
+structure differs from their external API.
 
 ### Setting up a Crates.io Account
 

@@ -7,16 +7,16 @@ here in Listing 7-6:
 <span class="filename">Filename: src/main.rs</span>
 
 ```rust
-pub mod a {
-    pub mod series {
-        pub mod of {
+mod a {
+    mod series {
+        mod of {
             pub fn nested_modules() {}
         }
     }
 }
 
 fn main() {
-    a::series::of::nested_modules();
+    crate::a::series::of::nested_modules();
 }
 ```
 
@@ -30,29 +30,29 @@ Fortunately, Rust has a keyword to make these calls more concise.
 
 Rust’s `use` keyword shortens lengthy function calls by bringing the modules of
 the function you want to call into scope. Here’s an example of bringing the
-`a::series::of` module into a binary crate’s root scope:
+`crate::a::series::of` module into a binary crate’s root scope:
 
 <span class="filename">Filename: src/main.rs</span>
 
 ```rust
-pub mod a {
-    pub mod series {
-        pub mod of {
+mod a {
+    mod series {
+        mod of {
             pub fn nested_modules() {}
         }
     }
 }
 
-use a::series::of;
+use crate::a::series::of;
 
 fn main() {
     of::nested_modules();
 }
 ```
 
-The line `use a::series::of;` means that rather than using the full
-`a::series::of` path wherever we want to refer to the `of` module, we can use
-`of`.
+The line `use crate::a::series::of;` means that rather than using the full
+`crate::a::series::of` path wherever we want to refer to the `of` module, we
+can use `of`.
 
 The `use` keyword brings only what we’ve specified into scope: it does not
 bring children of modules into scope. That’s why we still have to use
@@ -62,15 +62,15 @@ We could have chosen to bring the function into scope by instead specifying the
 function in the `use` as follows:
 
 ```rust
-pub mod a {
-    pub mod series {
-        pub mod of {
+mod a {
+    mod series {
+        mod of {
             pub fn nested_modules() {}
         }
     }
 }
 
-use a::series::of::nested_modules;
+use crate::a::series::of::nested_modules;
 
 fn main() {
     nested_modules();
@@ -92,7 +92,7 @@ enum TrafficLight {
     Green,
 }
 
-use TrafficLight::{Red, Yellow};
+use crate::TrafficLight::{Red, Yellow};
 
 fn main() {
     let red = Red;
@@ -116,7 +116,7 @@ enum TrafficLight {
     Green,
 }
 
-use TrafficLight::*;
+use crate::TrafficLight::*;
 
 fn main() {
     let red = Red;
@@ -192,20 +192,18 @@ error[E0433]: failed to resolve. Use of undeclared type or module `client`
   |         ^^^^^^^^^^^^^^^ Use of undeclared type or module `client`
 ```
 
-The compilation failed, but why? We don’t need to place `communicator::` in
+The compilation failed, but why? We don’t need to place `::communicator::` in
 front of the function like we did in *src/main.rs* because we are definitely
-within the `communicator` library crate here. The reason is that paths are
-always relative to the current module, which here is `tests`. The only
-exception is in a `use` statement, where paths are relative to the crate root
-by default. Our `tests` module needs the `client` module in its scope!
+within the `communicator` library crate here. The reason is that our `tests`
+module needs the `client` module in its scope!
 
 So how do we get back up one module in the module hierarchy to call the
 `client::connect` function in the `tests` module? In the `tests` module, we can
-either use leading colons to let Rust know that we want to start from the root
-and list the whole path, like this:
+either use `crate::` to let Rust know that we want to start from the root and
+list the whole path, like this:
 
 ```rust,ignore
-::client::connect();
+crate::client::connect();
 ```
 
 Or, we can use `super` to move up one module in the hierarchy from our current
