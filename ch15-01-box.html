@@ -196,7 +196,7 @@ is using both a variable and a box. I've tried to clarify. /Carol -->
 except the first is repeated? does an item contain both its own value and the
 next **item**, or the next **value**? Is it a continually nesting list? I'm
 finding it hard to visualize -->
-<!-- Did Figure 15-4 (trpln15-01.svg that I sent) help at all? /Carol-->
+<!-- Did Figure 15-4 (trpl15-01.svg that I sent) help at all? /Carol-->
 <p>Rust needs to know at compile time how much space a type takes up. One kind of
 type whose size can't be known at compile time is a <em>recursive type</em> where a
 value can have as part of itself another value of the same type. This nesting
@@ -206,13 +206,13 @@ so by inserting a box in a recursive type definition, we are allowed to have
 recursive types.</p>
 <p>Let's explore the <em>cons list</em>, a data type common in functional programming
 languages, to illustrate this concept. The cons list type we're going to define
-is straightforward except for its recursiveness, so the concepts in this
-example will be useful any time you get into more complex situations involving
+is straightforward except for the recursion, so the concepts in this example
+will be useful any time you get into more complex situations involving
 recursive types.</p>
 <!-- can you also say why we're discussing cons lists in such depth? It seems
 like a detour from the smart pointers conversation, is it just another concept
 we're covering or is it imperative for learning about smart pointers? Either
-way, can you lay that out up front, I thnk this could throw readers -->
+way, can you lay that out up front, I think this could throw readers -->
 <!-- A cons list is an example that's fairly simple but illustrates the use
 case for Box. Readers may find themselves wanting to define a variety of
 recursive types more complicated than cons lists in the future, and this
@@ -341,7 +341,7 @@ recursive type like the <code>List</code> enum in Listing 15-2 needs. The compil
 by looking at the <code>Cons</code> variant, which holds a value of type <code>i32</code> and a value
 of type <code>List</code>. Therefore, <code>Cons</code> needs an amount of space equal to the size of
 an <code>i32</code> plus the size of a <code>List</code>. To figure out how much memory the <code>List</code>
-type needs, the complier looks at the variants, starting with the <code>Cons</code>
+type needs, the compiler looks at the variants, starting with the <code>Cons</code>
 variant. The <code>Cons</code> variant holds a value of type <code>i32</code> and a value of type
 <code>List</code>, and this continues infinitely, as shown in Figure 15-5.</p>
 <p><img alt="An infinite Cons list" src="img/trpl15-01.svg" class="center" style="width: 50%;" /></p>

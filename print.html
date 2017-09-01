@@ -4732,7 +4732,7 @@ variants.</p>
 From 1999 through 2008, the United States minted quarters with different
 designs for each of the 50 states on one side. No other coins got state
 designs, so only quarters have this extra value. We can add this information to
-our <code>enum</code> by changing the <code>Quarter</code> variant to include a <code>State</code> value stored
+our <code>enum</code> by changing the <code>Quarter</code> variant to include a <code>UsState</code> value stored
 inside it, which we’ve done here in Listing 6-4:</p>
 <pre><pre class="playpen"><code class="language-rust"># #![allow(unused_variables)]
 #fn main() {
@@ -8209,7 +8209,7 @@ implementation.</p>
 <p>Default implementations are allowed to call the other methods in the same
 trait, even if those other methods don’t have a default implementation. In this
 way, a trait can provide a lot of useful functionality and only require
-implementers to specify a small part of it. We could choose to have the
+implementors to specify a small part of it. We could choose to have the
 <code>Summarizable</code> trait also have an <code>author_summary</code> method whose implementation
 is required, then a <code>summary</code> method that has a default implementation that
 calls the <code>author_summary</code> method:</p>
@@ -8443,7 +8443,7 @@ let s = 3.to_string();
 
 #}</code></pre></pre>
 <p>Blanket implementations appear in the documentation for the trait in the
-“Implementers” section.</p>
+“Implementors” section.</p>
 <p>Traits and trait bounds let us write code that uses generic type parameters in
 order to reduce duplication, but still specify to the compiler exactly what
 behavior our code needs the generic type to have. Because we’ve given the trait
@@ -12656,7 +12656,7 @@ also define an <code>Item</code> type, and this <code>Item</code> type is used i
 the <code>next</code> method. In other words, the <code>Item</code> type will be the type of element
 that’s returned from the iterator.</p>
 <p>The <code>next</code> method is the only method that the <code>Iterator</code> trait requires
-implementers of the trait to define. <code>next</code> returns one item of the iterator
+implementors of the trait to define. <code>next</code> returns one item of the iterator
 at a time wrapped in <code>Some</code>, and when iteration is over, it returns <code>None</code>.
 We can call the <code>next</code> method on iterators directly if we’d like; Listing 13-15
 has a test that demonstrates the values we’d get on repeated calls to <code>next</code>
@@ -13327,7 +13327,7 @@ high-level abstraction, get compiled down to roughly the same code as if you’d
 written the lower-level code yourself. Iterators are one of Rust’s <em>zero-cost
 abstractions</em>, by which we mean using the abstraction imposes no additional
 runtime overhead in the same way that Bjarne Stroustrup, the original designer
-and implementer of C++, defines <em>zero-overhead</em>:</p>
+and implementor of C++, defines <em>zero-overhead</em>:</p>
 <blockquote>
 <p>In general, C++ implementations obey the zero-overhead principle: What you
 don’t use, you don’t pay for. And further: What you do use, you couldn’t hand
@@ -14280,7 +14280,7 @@ of pointer that only borrow data; by contrast, in many cases, smart pointers
 <p>We've actually already encountered a few smart pointers in this book, such as
 <code>String</code> and <code>Vec&lt;T&gt;</code> from Chapter 8, though we didn't call them smart pointers
 at the time. Both these types count as smart pointers because they own some
-memory and allow you to manipulate it. They also havemetadata (such as their
+memory and allow you to manipulate it. They also have metadata (such as their
 capacity) and extra capabilities or guarantees (such as <code>String</code> ensuring its
 data will always be valid UTF-8).</p>
 <!-- Above: we said smart pointers don't own values earlier but in the
@@ -14290,7 +14290,7 @@ contradiction? -->
 references and smart pointers is that references are a kind of pointer that
 only borrow data; by contrast, in many cases, smart pointers *own* the data
 that they point to." You had edited this to say the opposite: "In Rust, smart
-pointers can only borrow data, whereas in many other langauges, smart pointers
+pointers can only borrow data, whereas in many other languages, smart pointers
 *own* the data they point to." We had the "in rust" phrase not to distinguish
 Rust's smart pointer implementation from other languages' smart pointer
 implementations, but to acknowledge that the concept of borrowing and ownership
@@ -14395,7 +14395,7 @@ is using both a variable and a box. I've tried to clarify. /Carol -->
 except the first is repeated? does an item contain both its own value and the
 next **item**, or the next **value**? Is it a continually nesting list? I'm
 finding it hard to visualize -->
-<!-- Did Figure 15-4 (trpln15-01.svg that I sent) help at all? /Carol-->
+<!-- Did Figure 15-4 (trpl15-01.svg that I sent) help at all? /Carol-->
 <p>Rust needs to know at compile time how much space a type takes up. One kind of
 type whose size can't be known at compile time is a <em>recursive type</em> where a
 value can have as part of itself another value of the same type. This nesting
@@ -14405,13 +14405,13 @@ so by inserting a box in a recursive type definition, we are allowed to have
 recursive types.</p>
 <p>Let's explore the <em>cons list</em>, a data type common in functional programming
 languages, to illustrate this concept. The cons list type we're going to define
-is straightforward except for its recursiveness, so the concepts in this
-example will be useful any time you get into more complex situations involving
+is straightforward except for the recursion, so the concepts in this example
+will be useful any time you get into more complex situations involving
 recursive types.</p>
 <!-- can you also say why we're discussing cons lists in such depth? It seems
 like a detour from the smart pointers conversation, is it just another concept
 we're covering or is it imperative for learning about smart pointers? Either
-way, can you lay that out up front, I thnk this could throw readers -->
+way, can you lay that out up front, I think this could throw readers -->
 <!-- A cons list is an example that's fairly simple but illustrates the use
 case for Box. Readers may find themselves wanting to define a variety of
 recursive types more complicated than cons lists in the future, and this
@@ -14540,7 +14540,7 @@ recursive type like the <code>List</code> enum in Listing 15-2 needs. The compil
 by looking at the <code>Cons</code> variant, which holds a value of type <code>i32</code> and a value
 of type <code>List</code>. Therefore, <code>Cons</code> needs an amount of space equal to the size of
 an <code>i32</code> plus the size of a <code>List</code>. To figure out how much memory the <code>List</code>
-type needs, the complier looks at the variants, starting with the <code>Cons</code>
+type needs, the compiler looks at the variants, starting with the <code>Cons</code>
 variant. The <code>Cons</code> variant holds a value of type <code>i32</code> and a value of type
 <code>List</code>, and this continues infinitely, as shown in Figure 15-5.</p>
 <p><img alt="An infinite Cons list" src="img/trpl15-01.svg" class="center" style="width: 50%;" /></p>
@@ -14634,15 +14634,15 @@ different way in the below paragraph /Carol -->
 define our own type like <code>Box&lt;T&gt;</code> and see why <code>*</code> doesn't work like a
 reference. We'll explore how implementing the <code>Deref</code> trait makes it possible
 for smart pointers to work in a similar way as references. Finally, we'll look
-at the <em>deref coersion</em> feature of Rust and how that lets us work with either
-references or smart pointors.</p>
+at the <em>deref coercion</em> feature of Rust and how that lets us work with either
+references or smart pointers.</p>
 <a class="header" href="print.html#following-the-pointer-to-the-value-with-" id="following-the-pointer-to-the-value-with-"><h3>Following the Pointer to the Value with <code>*</code></h3></a>
 <!-- I want to avoid too much cross referencing, I think it can be distracting,
 make the reader feel they need to flip back but they don't really, here -->
 <!-- Ok, guess we went too far then! I've been adding *more* cross referencing
 so that the reader can go back if they've forgotten something we've already
 covered. /Carol -->
-<!--Oh! I see, de-reference, meaning we cut the tie betweewn the data and the
+<!--Oh! I see, de-reference, meaning we cut the tie between the data and the
 reference? I've assumed so above, please correct if not! -->
 <!-- I wouldn't describe it as "cutting the tie"; the tie is still there. It's
 more like we're following an arrow (the pointer) to find the value. Let us know
@@ -14754,7 +14754,7 @@ dereference <code>MyBox</code>:</p>
 </code></pre>
 <p><span class="caption">Listing 15-11: Attempting to use <code>MyBox&lt;T&gt;</code> in the same
 way we were able to use references and <code>Box&lt;T&gt;</code></span></p>
-<p>The compliation error we get is:</p>
+<p>The compilation error we get is:</p>
 <pre><code class="language-text">error: type `MyBox&lt;{integer}&gt;` cannot be dereferenced
   --&gt; src/main.rs:14:19
    |
@@ -14833,7 +14833,7 @@ describe it as implicit. /Carol -->
 <p>Rust tends to favor explicitness over implicitness, but one exception is deref
 coercions of arguments to functions and methods. Rust performs <em>deref coercion</em>
 to convert a reference to a type that implements <code>Deref</code> into a reference to a
-type that <code>Deref</code> can convert the original type into. Deref coersion happens
+type that <code>Deref</code> can convert the original type into. Deref coercion happens
 automatically when we pass a reference to a value of a particular type as an
 argument to a function or method that doesn't match the type of the parameter
 in the function or method definition, and there's a sequence of calls to the
@@ -14898,7 +14898,7 @@ by calling <code>deref</code>. The standard library provides an implementation o
 on <code>String</code> that returns a string slice, which we can see in the API
 documentation for <code>Deref</code>. Rust calls <code>deref</code> again to turn the <code>&amp;String</code> into
 <code>&amp;str</code>, which matches the <code>hello</code> function's definition.</p>
-<p>If Rust didn't implement deref coersion, in order to call <code>hello</code> with a value
+<p>If Rust didn't implement deref coercion, in order to call <code>hello</code> with a value
 of type <code>&amp;MyBox&lt;String&gt;</code>, we'd have to write the code in Listing 15-15 instead
 of the code in Listing 15-14:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
@@ -14955,7 +14955,8 @@ references, Rust provides a <code>DerefMut</code> trait for overriding <code>*</
 references.</p>
 <p>Rust does deref coercion when it finds types and trait implementations in three
 cases:</p>
-<!-- Would it make sense to move this list to the start of the deref setion? -->
+<!-- Would it make sense to move this list to the start of the deref section?
+-->
 <!-- I don't think this list makes very much sense until you understand what
 deref coercion *is*. Can you elaborate on why you think it should be moved to
 the beginning? /Carol -->
@@ -15080,7 +15081,7 @@ releases the lock to run so that other code in the same scope can acquire the
 lock. First, let's see what happens if we try to call the <code>Drop</code> trait's <code>drop</code>
 method ourselves by modifying the <code>main</code> function from Listing 15-8 as shown in
 Listing 15-9:</p>
-<!-- Above: I'm not following why we are doing this, if it's not necesary and
+<!-- Above: I'm not following why we are doing this, if it's not necessary and
 we aren't going to cover it now anyway -- can you lay out why we're discussing
 this here? -->
 <!-- Done. /Carol -->
@@ -15103,7 +15104,7 @@ the <code>Drop</code> trait manually to clean up early</span></p>
 </code></pre>
 <p>This error message says we're not allowed to explicitly call <code>drop</code>. The error
 message uses the term <em>destructor</em>, which is the general programming term for a
-function that cleans up an instance. A <em>destructor</em> is analagous to a
+function that cleans up an instance. A <em>destructor</em> is analogous to a
 <em>constructor</em> that creates an instance. The <code>drop</code> function in Rust is one
 particular destructor.</p>
 <p>Rust doesn't let us call <code>drop</code> explicitly because Rust would still
@@ -15359,21 +15360,33 @@ useful! In the next section, we'll discuss the interior mutability pattern and
 the <code>RefCell&lt;T&gt;</code> type that we can use in conjunction with an <code>Rc&lt;T&gt;</code> to work
 with this restriction on immutability.</p>
 <a class="header" href="print.html#refcellt-and-the-interior-mutability-pattern" id="refcellt-and-the-interior-mutability-pattern"><h2><code>RefCell&lt;T&gt;</code> and the Interior Mutability Pattern</h2></a>
+<!-- I'm concerned here about referencing forward too much, do we need that
+information from Ch 19 to understand this? Should we look at rearranging a few
+things here? -->
+<!-- We don't think the reader needs to *understand* `unsafe` at this point,
+just that `unsafe` is how this is possible and that we'll learn about `unsafe`
+later. After reading this section, did you feel that you needed to know more
+about `unsafe` to understand this section? /Carol -->
+<!--below: as in, we use the pattern, or it's used automatically? I'm not clear
+on what's the user's responsibility with this pattern -->
+<!-- When we choose to use types implemented using the interior mutability
+pattern, or when we implement our own types using the interior mutability
+pattern. /Carol -->
 <p><em>Interior mutability</em> is a design pattern in Rust for allowing you to mutate
-data even though there are immutable references to that data, which would
-normally be disallowed by the borrowing rules. The interior mutability pattern
-involves using <code>unsafe</code> code inside a data structure to bend Rust’s usual rules
-around mutation and borrowing. We haven’t yet covered unsafe code; we will in
-Chapter 19. The interior mutability pattern is used when you can ensure that
-the borrowing rules will be followed at runtime, even though the compiler can’t
+data even when there are immutable references to that data, normally disallowed
+by the borrowing rules. To do so, the pattern uses <code>unsafe</code> code inside a data
+structure to bend Rust's usual rules around mutation and borrowing. We haven't
+yet covered unsafe code; we will in Chapter 19. We can choose to use types that
+make use of the interior mutability pattern when we can ensure that the
+borrowing rules will be followed at runtime, even though the compiler can't
 ensure that. The <code>unsafe</code> code involved is then wrapped in a safe API, and the
 outer type is still immutable.</p>
-<p>Let’s explore this by looking at the <code>RefCell&lt;T&gt;</code> type that follows the
+<p>Let's explore this by looking at the <code>RefCell&lt;T&gt;</code> type that follows the
 interior mutability pattern.</p>
-<a class="header" href="print.html#refcellt-has-interior-mutability" id="refcellt-has-interior-mutability"><h3><code>RefCell&lt;T&gt;</code> has Interior Mutability</h3></a>
+<a class="header" href="print.html#enforcing-borrowing-rules-at-runtime-with-refcellt" id="enforcing-borrowing-rules-at-runtime-with-refcellt"><h3>Enforcing Borrowing Rules at Runtime with <code>RefCell&lt;T&gt;</code></h3></a>
 <p>Unlike <code>Rc&lt;T&gt;</code>, the <code>RefCell&lt;T&gt;</code> type represents single ownership over the data
-that it holds. So, what makes <code>RefCell&lt;T&gt;</code> different than a type like <code>Box&lt;T&gt;</code>?
-Let’s recall the borrowing rules we learned in Chapter 4:</p>
+it holds. So, what makes <code>RefCell&lt;T&gt;</code> different than a type like <code>Box&lt;T&gt;</code>?
+Let's recall the borrowing rules we learned in Chapter 4:</p>
 <ol>
 <li>At any given time, you can have <em>either</em> but not both of:</li>
 </ol>
@@ -15384,138 +15397,353 @@ Let’s recall the borrowing rules we learned in Chapter 4:</p>
 <ol start="2">
 <li>References must always be valid.</li>
 </ol>
-<p>With references and <code>Box&lt;T&gt;</code>, the borrowing rules’ invariants are enforced at
+<p>With references and <code>Box&lt;T&gt;</code>, the borrowing rules' invariants are enforced at
 compile time. With <code>RefCell&lt;T&gt;</code>, these invariants are enforced <em>at runtime</em>.
-With references, if you break these rules, you’ll get a compiler error. With
-<code>RefCell&lt;T&gt;</code>, if you break these rules, you’ll get a <code>panic!</code>.</p>
-<p>Static analysis, like the Rust compiler performs, is inherently conservative.
-There are properties of code that are impossible to detect by analyzing the
-code: the most famous is the Halting Problem, which is out of scope of this
-book but an interesting topic to research if you’re interested.</p>
-<p>Because some analysis is impossible, the Rust compiler does not try to even
-guess if it can’t be sure, so it’s conservative and sometimes rejects correct
-programs that would not actually violate Rust’s guarantees. Put another way, if
-Rust accepts an incorrect program, people would not be able to trust in the
-guarantees Rust makes. If Rust rejects a correct program, the programmer will
-be inconvenienced, but nothing catastrophic can occur. <code>RefCell&lt;T&gt;</code> is useful
-when you know that the borrowing rules are respected, but the compiler can’t
-understand that that’s true.</p>
-<p>Similarly to <code>Rc&lt;T&gt;</code>, <code>RefCell&lt;T&gt;</code> is only for use in single-threaded
-scenarios. We’ll talk about how to get the functionality of <code>RefCell&lt;T&gt;</code> in a
-multithreaded program in the next chapter on concurrency. For now, all you
-need to know is that if you try to use <code>RefCell&lt;T&gt;</code> in a multithreaded
-context, you’ll get a compile time error.</p>
-<p>With references, we use the <code>&amp;</code> and <code>&amp;mut</code> syntax to create references and
-mutable references, respectively. But with <code>RefCell&lt;T&gt;</code>, we use the <code>borrow</code>
-and <code>borrow_mut</code> methods, which are part of the safe API that <code>RefCell&lt;T&gt;</code> has.
-<code>borrow</code> returns the smart pointer type <code>Ref</code>, and <code>borrow_mut</code> returns the
-smart pointer type <code>RefMut</code>. These two types implement <code>Deref</code> so that we can
-treat them as if they’re regular references. <code>Ref</code> and <code>RefMut</code> track the
-borrows dynamically, and their implementation of <code>Drop</code> releases the borrow
-dynamically.</p>
-<p>Listing 15-14 shows what it looks like to use <code>RefCell&lt;T&gt;</code> with functions that
-borrow their parameters immutably and mutably. Note that the <code>data</code> variable is
-declared as immutable with <code>let data</code> rather than <code>let mut data</code>, yet
-<code>a_fn_that_mutably_borrows</code> is allowed to borrow the data mutably and make
-changes to the data!</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playpen"><code class="language-rust">use std::cell::RefCell;
-
-fn a_fn_that_immutably_borrows(a: &amp;i32) {
-    println!(&quot;a is {}&quot;, a);
+With references, if you break these rules, you'll get a compiler error. With
+<code>RefCell&lt;T&gt;</code>, if you break these rules, you'll get a <code>panic!</code>.</p>
+<!-- Is there an advantage to having these rules enforced at different times?
+-->
+<!-- Yes, that's what we were trying to say below, we've tried to make this more explicit /Carol -->
+<p>The advantages to checking the borrowing rules at compile time are that errors
+will be caught sooner in the development process and there is no impact on
+runtime performance since all the analysis is completed beforehand. For those
+reasons, checking the borrowing rules at compile time is the best choice for
+the majority of cases, which is why this is Rust's default.</p>
+<p>The advantage to checking the borrowing rules at runtime instead is that
+certain memory safe scenarios are then allowed, whereas they are disallowed by
+the compile time checks. Static analysis, like the Rust compiler, is inherently
+conservative. Some properties of code are impossible to detect by analyzing the
+code: the most famous exampled is the Halting Problem, which is out of scope of
+this book but an interesting topic to research if you're interested.</p>
+<!--below: can't be sure of what, exactly? Sure that the code complies with the
+ownership rules? -->
+<!-- Yes /Carol -->
+<p>Because some analysis is impossible, if the Rust compiler can't be sure the
+code complies with the ownership rules, it may reject a correct program; in
+this way, it is conservative. If Rust were to accept an incorrect program,
+users would not be able to trust in the guarantees Rust makes, but if Rust
+rejects a correct program, the programmer will be inconvenienced, but nothing
+catastrophic can occur. <code>RefCell&lt;T&gt;</code> is useful when you yourself are sure that
+your code follows the borrowing rules, but the compiler is not able to
+understand and guarantee that.</p>
+<p>Similarly to <code>Rc&lt;T&gt;</code>, <code>RefCell&lt;T&gt;</code> is only for use in single-threaded scenarios
+and will give you a compile time error if you try in a multithreaded context.
+We'll talk about how to get the functionality of <code>RefCell&lt;T&gt;</code> in a
+multithreaded program in Chapter 16.</p>
+<!-- I'm not really clear at this point what the difference between Rc<T> and
+RefCell<T> is, perhaps a succinct round up would help? -->
+<!-- Done /Carol -->
+<p>To recap the reasons to choose <code>Box&lt;T&gt;</code>, <code>Rc&lt;T&gt;</code>, or <code>RefCell&lt;T&gt;</code>:</p>
+<ul>
+<li><code>Rc&lt;T&gt;</code> enables multiple owners of the same data; <code>Box&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code>
+have single owners.</li>
+<li><code>Box&lt;T&gt;</code> allows immutable or mutable borrows checked at compile time; <code>Rc&lt;T&gt;</code>
+only allows immutable borrows checked at compile time; <code>RefCell&lt;T&gt;</code> allows
+immutable or mutable borrows checked at runtime.</li>
+<li>Because <code>RefCell&lt;T&gt;</code> allows mutable borrows checked at runtime, we can mutate
+the value inside the <code>RefCell&lt;T&gt;</code> even when the <code>RefCell&lt;T&gt;</code> is itself
+immutable.</li>
+</ul>
+<p>The last reason is the <em>interior mutability</em> pattern. Let's look at a case when
+interior mutability is useful and discuss how this is possible.</p>
+<a class="header" href="print.html#interior-mutability-a-mutable-borrow-to-an-immutable-value" id="interior-mutability-a-mutable-borrow-to-an-immutable-value"><h3>Interior Mutability: A Mutable Borrow to an Immutable Value</h3></a>
+<p>A consequence of the borrowing rules is that when we have an immutable value,
+we can't borrow it mutably. For example, this code won't compile:</p>
+<pre><code class="language-rust ignore">fn main() {
+    let x = 5;
+    let y = &amp;mut x;
 }
-
-fn a_fn_that_mutably_borrows(b: &amp;mut i32) {
-    *b += 1;
-}
-
-fn demo(r: &amp;RefCell&lt;i32&gt;) {
-    a_fn_that_immutably_borrows(&amp;r.borrow());
-    a_fn_that_mutably_borrows(&amp;mut r.borrow_mut());
-    a_fn_that_immutably_borrows(&amp;r.borrow());
-}
-
-fn main() {
-    let data = RefCell::new(5);
-    demo(&amp;data);
-}
-</code></pre></pre>
-<p><span class="caption">Listing 15-14: Using <code>RefCell&lt;T&gt;</code>, <code>borrow</code>, and
-<code>borrow_mut</code></span></p>
-<p>This example prints:</p>
-<pre><code class="language-text">a is 5
-a is 6
 </code></pre>
-<p>In <code>main</code>, we’ve created a new <code>RefCell&lt;i32&gt;</code> containing the value 5, and stored
-in the variable <code>data</code>, declared without the <code>mut</code> keyword. We then call the
-<code>demo</code> function with an immutable reference to <code>data</code>: as far as <code>main</code> is
-concerned, <code>data</code> is immutable!</p>
-<p>In the <code>demo</code> function, we get an immutable reference to the value inside the
-<code>RefCell&lt;i32&gt;</code> by calling the <code>borrow</code> method, and we call
-<code>a_fn_that_immutably_borrows</code> with that immutable reference. More
-interestingly, we can get a <em>mutable</em> reference to the value inside the
-<code>RefCell&lt;i32&gt;</code> with the <code>borrow_mut</code> method, and the function
-<code>a_fn_that_mutably_borrows</code> is allowed to change the value. We can see that the
-next time we call <code>a_fn_that_immutably_borrows</code> that prints out the value, it’s
-6 instead of 5.</p>
-<a class="header" href="print.html#borrowing-rules-are-checked-at-runtime-on-refcellt" id="borrowing-rules-are-checked-at-runtime-on-refcellt"><h3>Borrowing Rules are Checked at Runtime on <code>RefCell&lt;T&gt;</code></h3></a>
-<p>Recall from Chapter 4 that because of the borrowing rules, this code using
-regular references that tries to create two mutable borrows in the same scope
-won’t compile:</p>
-<pre><code class="language-rust ignore">let mut s = String::from(&quot;hello&quot;);
-
-let r1 = &amp;mut s;
-let r2 = &amp;mut s;
-</code></pre>
-<p>We’ll get this compiler error:</p>
-<pre><code class="language-text">error[E0499]: cannot borrow `s` as mutable more than once at a time
- --&gt;
+<p>If we try to compile this, we'll get this error:</p>
+<pre><code class="language-text">error[E0596]: cannot borrow immutable local variable `x` as mutable
+ --&gt; src/main.rs:3:18
   |
-5 |     let r1 = &amp;mut s;
-  |                   - first mutable borrow occurs here
-6 |     let r2 = &amp;mut s;
-  |                   ^ second mutable borrow occurs here
-7 | }
-  | - first borrow ends here
+2 |     let x = 5;
+  |         - consider changing this to `mut x`
+3 |     let y = &amp;mut x;
+  |                  ^ cannot borrow mutably
 </code></pre>
-<p>In contrast, using <code>RefCell&lt;T&gt;</code> and calling <code>borrow_mut</code> twice in the same
-scope <em>will</em> compile, but it’ll panic at runtime instead. This code:</p>
-<pre><pre class="playpen"><code class="language-rust should_panic">use std::cell::RefCell;
-
-fn main() {
-    let s = RefCell::new(String::from(&quot;hello&quot;));
-
-    let r1 = s.borrow_mut();
-    let r2 = s.borrow_mut();
+<p>However, there are situations where it would be useful for a value to be able
+to mutate itself in its methods, but to other code, the value would appear to
+be immutable. Code outside the value's methods would not be able to mutate the
+value. <code>RefCell&lt;T&gt;</code> is one way to get the ability to have interior mutability.
+<code>RefCell&lt;T&gt;</code> isn't getting around the borrowing rules completely, but the
+borrow checker in the compiler allows this interior mutability and the
+borrowing rules are checked at runtime instead. If we violate the rules, we'll
+get a <code>panic!</code> instead of a compiler error.</p>
+<p>Let's work through a practical example where we can use <code>RefCell&lt;T&gt;</code> to make it
+possible to mutate an immutable value and see why that's useful.</p>
+<a class="header" href="print.html#a-use-case-for-interior-mutability-mock-objects" id="a-use-case-for-interior-mutability-mock-objects"><h4>A Use Case for Interior Mutability: Mock Objects</h4></a>
+<p>A <em>mock object</em> is the general programming concept for a type that stands in
+the place of another type during testing. Mock objects simulate real objects,
+and they can record what happens during a test so that we can assert that the
+correct actions took place.</p>
+<p>While Rust doesn't have objects in the exact same sense that other languages
+have objects, and Rust doesn't have mock object functionality built into the
+standard library like some other languages do, we can definitely create a
+struct that will serve the same purposes as a mock object.</p>
+<p>Here's the scenario we'd like to test: we're creating a library that tracks a
+value against a maximum value, and sends messages based on how close to the
+maximum value the current value is. This could be used for keeping track of a
+user's quota for the number of API calls they're allowed to make, for example.</p>
+<p>Our library is only going to provide the functionality of tracking how close to
+the maximum a value is, and what the messages should be at what times.
+Applications that use our library will be expected to provide the actual
+mechanism for sending the messages: the application could choose to put a
+message in the application, send an email, send a text message, or something
+else. Our library doesn't need to know about that detail; all it needs is
+something that implements a trait we'll provide called <code>Messenger</code>. Listing
+15-15 shows our library code:</p>
+<p><span class="filename">Filename: src/lib.rs</span></p>
+<pre><pre class="playpen"><code class="language-rust"># #![allow(unused_variables)]
+#fn main() {
+pub trait Messenger {
+    fn send(&amp;self, msg: &amp;str);
 }
-</code></pre></pre>
-<p>compiles but panics with the following error when we <code>cargo run</code>:</p>
-<pre><code class="language-text">    Finished dev [unoptimized + debuginfo] target(s) in 0.83 secs
-     Running `target/debug/refcell`
-thread 'main' panicked at 'already borrowed: BorrowMutError',
-/stable-dist-rustc/build/src/libcore/result.rs:868
+
+pub struct LimitTracker&lt;'a, T: 'a + Messenger&gt; {
+    messenger: &amp;'a T,
+    value: usize,
+    max: usize,
+}
+
+impl&lt;'a, T&gt; LimitTracker&lt;'a, T&gt;
+    where T: Messenger {
+    pub fn new(messenger: &amp;T, max: usize) -&gt; LimitTracker&lt;T&gt; {
+        LimitTracker {
+            messenger,
+            value: 0,
+            max,
+        }
+    }
+
+    pub fn set_value(&amp;mut self, value: usize) {
+        self.value = value;
+
+        let percentage_of_max = self.value as f64 / self.max as f64;
+
+        if percentage_of_max &gt;= 0.75 &amp;&amp; percentage_of_max &lt; 0.9 {
+            self.messenger.send(&quot;Warning: You've used up over 75% of your quota!&quot;);
+        } else if percentage_of_max &gt;= 0.9 &amp;&amp; percentage_of_max &lt; 1.0 {
+            self.messenger.send(&quot;Urgent warning: You've used up over 90% of your quota!&quot;);
+        } else if percentage_of_max &gt;= 1.0 {
+            self.messenger.send(&quot;Error: You are over your quota!&quot;);
+        }
+    }
+}
+
+#}</code></pre></pre>
+<p><span class="caption">Listing 15-15: A library to keep track of how close to a
+maximum value a value is, and warn when the value is at certain levels</span></p>
+<p>One important part of this code is that the <code>Messenger</code> trait has one method,
+<code>send</code>, that takes an immutable reference to <code>self</code> and text of the message.
+This is the interface our mock object will need to have. The other important
+part is that we want to test the behavior of the <code>set_value</code> method on the
+<code>LimitTracker</code>. We can change what we pass in for the <code>value</code> parameter, but
+<code>set_value</code> doesn't return anything for us to make assertions on. What we want
+to be able to say is that if we create a <code>LimitTracker</code> with something that
+implements the <code>Messenger</code> trait and a particular value for <code>max</code>, when we pass
+different numbers for <code>value</code>, the messenger gets told to send the appropriate
+messages.</p>
+<p>What we need is a mock object that, instead of actually sending an email or
+text message when we call <code>send</code>, will only keep track of the messages it's
+told to send. We can create a new instance of the mock object, create a
+<code>LimitTracker</code> that uses the mock object, call the <code>set_value</code> method on
+<code>LimitTracker</code>, then check that the mock object has the messages we expect.
+Listing 15-16 shows an attempt of implementing a mock object to do just that,
+but that the borrow checker won't allow:</p>
+<p><span class="filename">Filename: src/lib.rs</span></p>
+<pre><pre class="playpen"><code class="language-rust"># #![allow(unused_variables)]
+#fn main() {
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct MockMessenger {
+        sent_messages: Vec&lt;String&gt;,
+    }
+
+    impl MockMessenger {
+        fn new() -&gt; MockMessenger {
+            MockMessenger { sent_messages: vec![] }
+        }
+    }
+
+    impl Messenger for MockMessenger {
+        fn send(&amp;self, message: &amp;str) {
+            self.sent_messages.push(String::from(message));
+        }
+    }
+
+    #[test]
+    fn it_sends_an_over_75_percent_warning_message() {
+        let mock_messenger = MockMessenger::new();
+        let mut limit_tracker = LimitTracker::new(&amp;mock_messenger, 100);
+
+        limit_tracker.set_value(80);
+
+        assert_eq!(mock_messenger.sent_messages.len(), 1);
+    }
+}
+
+#}</code></pre></pre>
+<p><span class="caption">Listing 15-16: An attempt to implement a <code>MockMessenger</code>
+that isn't allowed by the borrow checker</span></p>
+<p>This test code defines a <code>MockMessenger</code> struct that has a <code>sent_messages</code>
+field with a <code>Vec</code> of <code>String</code> values to keep track of the messages it's told
+to send. We also defined an associated function <code>new</code> to make it convenient to
+create new <code>MockMessenger</code> values that start with an empty list of messages. We
+then implement the <code>Messenger</code> trait for <code>MockMessenger</code> so that we can give a
+<code>MockMessenger</code> to a <code>LimitTracker</code>. In the definition of the <code>send</code> method, we
+take the message passed in as a parameter and store it in the <code>MockMessenger</code>
+list of <code>sent_messages</code>.</p>
+<p>In the test, we're testing what happens when the <code>LimitTracker</code> is told to set
+<code>value</code> to something that's over 75% of the <code>max</code> value. First, we create a new
+<code>MockMessenger</code>, which will start with an empty list of messages. Then we
+create a new <code>LimitTracker</code> and give it a reference to the new <code>MockMessenger</code>
+and a <code>max</code> value of 100. We call the <code>set_value</code> method on the <code>LimitTracker</code>
+with a value of 80, which is more than 75% of 100. Then we assert that the list
+of messages that the <code>MockMessenger</code> is keeping track of should now have one
+message in it.</p>
+<p>There's one problem with this test, however:</p>
+<pre><code class="language-text">error[E0596]: cannot borrow immutable field `self.sent_messages` as mutable
+  --&gt; src/lib.rs:46:13
+   |
+45 |         fn send(&amp;self, message: &amp;str) {
+   |                 ----- use `&amp;mut self` here to make mutable
+46 |             self.sent_messages.push(String::from(message));
+   |             ^^^^^^^^^^^^^^^^^^ cannot mutably borrow immutable field
+</code></pre>
+<p>We can't modify the <code>MockMessenger</code> to keep track of the messages because the
+<code>send</code> method takes an immutable reference to <code>self</code>. We also can't take the
+suggestion from the error text to use <code>&amp;mut self</code> instead because then the
+signature of <code>send</code> wouldn't match the signature in the <code>Messenger</code> trait
+definition (feel free to try and see what error message you get).</p>
+<p>This is where interior mutability can help! We're going to store the
+<code>sent_messages</code> within a <code>RefCell</code>, and then the <code>send</code> message will be able to
+modify <code>sent_messages</code> to store the messages we've seen. Listing 15-17 shows
+what that looks like:</p>
+<p><span class="filename">Filename: src/lib.rs</span></p>
+<pre><pre class="playpen"><code class="language-rust"># #![allow(unused_variables)]
+#fn main() {
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::cell::RefCell;
+
+    struct MockMessenger {
+        sent_messages: RefCell&lt;Vec&lt;String&gt;&gt;,
+    }
+
+    impl MockMessenger {
+        fn new() -&gt; MockMessenger {
+            MockMessenger { sent_messages: RefCell::new(vec![]) }
+        }
+    }
+
+    impl Messenger for MockMessenger {
+        fn send(&amp;self, message: &amp;str) {
+            self.sent_messages.borrow_mut().push(String::from(message));
+        }
+    }
+
+    #[test]
+    fn it_sends_an_over_75_percent_warning_message() {
+        // ...snip...
+#         let mock_messenger = MockMessenger::new();
+#         let mut limit_tracker = LimitTracker::new(&amp;mock_messenger, 100);
+#         limit_tracker.set_value(75);
+
+        assert_eq!(mock_messenger.sent_messages.borrow().len(), 1);
+    }
+}
+
+#}</code></pre></pre>
+<p><span class="caption">Listing 15-17: Using <code>RefCell&lt;T&gt;</code> to be able to mutate an
+inner value while the outer value is considered immutable</span></p>
+<p>The <code>sent_messages</code> field is now of type <code>RefCell&lt;Vec&lt;String&gt;&gt;</code> instead of
+<code>Vec&lt;String&gt;</code>. In the <code>new</code> function, we create a new <code>RefCell</code> instance around
+the empty vector.</p>
+<p>For the implementation of the <code>send</code> method, the first parameter is still an
+immutable borrow of <code>self</code>, which matches the trait definition. We call
+<code>borrow_mut</code> on the <code>RefCell</code> in <code>self.sent_messages</code> to get a mutable
+reference to the value inside the <code>RefCell</code>, which is the vector. Then we can
+call <code>push</code> on the mutable reference to the vector in order to keep track of
+the messages seen during the test.</p>
+<p>The last change we have to make is in the assertion: in order to see how many
+items are in the inner vector, we call <code>borrow</code> on the <code>RefCell</code> to get an
+immutable reference to the vector.</p>
+<p>Now that we've seen how to use <code>RefCell&lt;T&gt;</code>, let's dig into how it works!</p>
+<a class="header" href="print.html#refcellt-keeps-track-of-borrows-at-runtime" id="refcellt-keeps-track-of-borrows-at-runtime"><h4><code>RefCell&lt;T&gt;</code> Keeps Track of Borrows at Runtime</h4></a>
+<p>When creating immutable and mutable references we use the <code>&amp;</code> and <code>&amp;mut</code>
+syntax, respectively. With <code>RefCell&lt;T&gt;</code>, we use the <code>borrow</code> and <code>borrow_mut</code>
+methods, which are part of the safe API that belongs to <code>RefCell&lt;T&gt;</code>. The
+<code>borrow</code> method returns the smart pointer type <code>Ref</code>, and <code>borrow_mut</code> returns
+the smart pointer type <code>RefMut</code>. Both types implement <code>Deref</code> so we can treat
+them like regular references.</p>
+<!-- can you clarify what you mean, practically, by "track borrows
+dynamically"?-->
+<!-- Yep, we've tried to clarify in the next paragraph. /Carol -->
+<p>The <code>RefCell&lt;T&gt;</code> keeps track of how many <code>Ref</code> and <code>RefMut</code> smart pointers are
+currently active. Every time we call <code>borrow</code>, the <code>RefCell&lt;T&gt;</code> increases its
+count of how many immutable borrows are active. When a <code>Ref</code> value goes out of
+scope, the count of immutable borrows goes down by one. Just like the compile
+time borrowing rules, <code>RefCell&lt;T&gt;</code> lets us have many immutable borrows or one
+mutable borrow at any point in time.</p>
+<p>If we try to violate these rules, rather than getting a compiler error like we
+would with references, the implementation of <code>RefCell&lt;T&gt;</code> will <code>panic!</code> at
+runtime. Listing 15-18 shows a modification to the implementation of <code>send</code>
+from Listing 15-17 where we're deliberately trying to create two mutable
+borrows active for the same scope in order to illustrate that <code>RefCell&lt;T&gt;</code>
+prevents us from doing this at runtime:</p>
+<p><span class="filename">Filename: src/lib.rs</span></p>
+<pre><code class="language-rust ignore">impl Messenger for MockMessenger {
+    fn send(&amp;self, message: &amp;str) {
+        let mut one_borrow = self.sent_messages.borrow_mut();
+        let mut two_borrow = self.sent_messages.borrow_mut();
+
+        one_borrow.push(String::from(message));
+        two_borrow.push(String::from(message));
+    }
+}
+</code></pre>
+<p><span class="caption">Listing 15-18: Creating two mutable references in the
+same scope to see that <code>RefCell&lt;T&gt;</code> will panic</span></p>
+<p>We create a variable <code>one_borrow</code> for the <code>RefMut</code> smart pointer returned from
+<code>borrow_mut</code>. Then we create another mutable borrow in the same way in the
+variable <code>two_borrow</code>. This makes two mutable references in the same scope,
+which isn't allowed. If we run the tests for our library, this code will
+compile without any errors, but the test will fail:</p>
+<pre><code class="language-text">---- tests::it_sends_an_over_75_percent_warning_message stdout ----
+    thread 'tests::it_sends_an_over_75_percent_warning_message' panicked at
+    'already borrowed: BorrowMutError', src/libcore/result.rs:906:4
 note: Run with `RUST_BACKTRACE=1` for a backtrace.
 </code></pre>
-<p>This runtime <code>BorrowMutError</code> is similar to the compiler error: it says we’ve
-already borrowed <code>s</code> mutably once, so we’re not allowed to borrow it again. We
-aren’t getting around the borrowing rules, we’re just choosing to have Rust
-enforce them at runtime instead of compile time. You could choose to use
-<code>RefCell&lt;T&gt;</code> everywhere all the time, but in addition to having to type
-<code>RefCell</code> a lot, you’d find out about possible problems later (possibly in
-production rather than during development). Also, checking the borrowing rules
-while your program is running has a performance penalty.</p>
-<a class="header" href="print.html#multiple-owners-of-mutable-data-by-combining-rct-and-refcellt" id="multiple-owners-of-mutable-data-by-combining-rct-and-refcellt"><h3>Multiple Owners of Mutable Data by Combining <code>Rc&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code></h3></a>
-<p>So why would we choose to make the tradeoffs that using <code>RefCell&lt;T&gt;</code> involves?
-Well, remember when we said that <code>Rc&lt;T&gt;</code> only lets you have an immutable
-reference to <code>T</code>? Given that <code>RefCell&lt;T&gt;</code> is immutable, but has interior
-mutability, we can combine <code>Rc&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code> to get a type that’s both
-reference counted and mutable. Listing 15-15 shows an example of how to do
-that, again going back to our cons list from Listing 15-5. In this example,
-instead of storing <code>i32</code> values in the cons list, we’ll be storing
-<code>Rc&lt;RefCell&lt;i32&gt;&gt;</code> values. We want to store that type so that we can have an
-owner of the value that’s not part of the list (the multiple owners
-functionality that <code>Rc&lt;T&gt;</code> provides), and so we can mutate the inner <code>i32</code>
-value (the interior mutability functionality that <code>RefCell&lt;T&gt;</code> provides):</p>
+<p>We can see that the code panicked with the message <code>already borrowed: BorrowMutError</code>. This is how <code>RefCell&lt;T&gt;</code> handles violations of the borrowing
+rules at runtime.</p>
+<p>Catching borrowing errors at runtime rather than compile time means that we'd
+find out that we made a mistake in our code later in the development process--
+and possibly not even until our code was deployed to production. There's also a
+small runtime performance penalty our code will incur as a result of keeping
+track of the borrows at runtime rather than compile time. However, using
+<code>RefCell</code> made it possible for us to write a mock object that can modify itself
+to keep track of the messages it has seen while we're using it in a context
+where only immutable values are allowed. We can choose to use <code>RefCell&lt;T&gt;</code>
+despite its tradeoffs to get more abilities than regular references give us.</p>
+<a class="header" href="print.html#having-multiple-owners-of-mutable-data-by-combining-rct-and-refcellt" id="having-multiple-owners-of-mutable-data-by-combining-rct-and-refcellt"><h3>Having Multiple Owners of Mutable Data by Combining <code>Rc&lt;T&gt;</code> and <code>RefCell&lt;T&gt;</code></h3></a>
+<p>A common way to use <code>RefCell&lt;T&gt;</code> is in combination with <code>Rc&lt;T&gt;</code>. Recall that
+<code>Rc&lt;T&gt;</code> lets us have multiple owners of some data, but it only gives us
+immutable access to that data. If we have an <code>Rc&lt;T&gt;</code> that holds a <code>RefCell&lt;T&gt;</code>,
+then we can get a value that can have multiple owners <em>and</em> that we can mutate!</p>
+<!-- maybe just recap on why we'd want that? -->
+<!-- done, below /Carol -->
+<p>For example, recall the cons list example from Listing 15-13 where we used
+<code>Rc&lt;T&gt;</code> to let us have multiple lists share ownership of another list. Because
+<code>Rc&lt;T&gt;</code> only holds immutable values, we aren't able to change any of the values
+in the list once we've created them. Let's add in <code>RefCell&lt;T&gt;</code> to get the
+ability to change the values in the lists. Listing 15-19 shows that by using a
+<code>RefCell&lt;T&gt;</code> in the <code>Cons</code> definition, we're allowed to modify the value stored
+in all the lists:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
 <pre><pre class="playpen"><code class="language-rust">#[derive(Debug)]
 enum List {
@@ -15530,49 +15758,51 @@ use std::cell::RefCell;
 fn main() {
     let value = Rc::new(RefCell::new(5));
 
-    let a = Cons(value.clone(), Rc::new(Nil));
-    let shared_list = Rc::new(a);
+    let a = Rc::new(Cons(Rc::clone(&amp;value), Rc::new(Nil)));
 
-    let b = Cons(Rc::new(RefCell::new(6)), shared_list.clone());
-    let c = Cons(Rc::new(RefCell::new(10)), shared_list.clone());
+    let b = Cons(Rc::new(RefCell::new(6)), Rc::clone(&amp;a));
+    let c = Cons(Rc::new(RefCell::new(10)), Rc::clone(&amp;a));
 
     *value.borrow_mut() += 10;
 
-    println!(&quot;shared_list after = {:?}&quot;, shared_list);
+    println!(&quot;a after = {:?}&quot;, a);
     println!(&quot;b after = {:?}&quot;, b);
     println!(&quot;c after = {:?}&quot;, c);
 }
 </code></pre></pre>
-<p><span class="caption">Listing 15-15: Using <code>Rc&lt;RefCell&lt;i32&gt;&gt;</code> to create a
+<p><span class="caption">Listing 15-19: Using <code>Rc&lt;RefCell&lt;i32&gt;&gt;</code> to create a
 <code>List</code> that we can mutate</span></p>
-<p>We’re creating a value, which is an instance of <code>Rc&lt;RefCell&lt;i32&gt;&gt;</code>. We’re
-storing it in a variable named <code>value</code> because we want to be able to access it
-directly later. Then we create a <code>List</code> in <code>a</code> that has a <code>Cons</code> variant that
-holds <code>value</code>, and <code>value</code> needs to be cloned since we want <code>value</code> to also
-have ownership in addition to <code>a</code>. Then we wrap <code>a</code> in an <code>Rc&lt;T&gt;</code> so that we
-can create lists <code>b</code> and <code>c</code> that start differently but both refer to <code>a</code>,
-similarly to what we did in Listing 15-12.</p>
-<p>Once we have the lists in <code>shared_list</code>, <code>b</code>, and <code>c</code> created, then we add 10
-to the 5 in <code>value</code> by dereferencing the <code>Rc&lt;i32&gt;</code> and calling <code>borrow_mut</code> on
-the <code>RefCell&lt;i32&gt;</code>.</p>
-<p>When we print out <code>shared_list</code>, <code>b</code>, and <code>c</code>, we can see that they all have
-the modified value of 15:</p>
-<pre><code class="language-text">shared_list after = Cons(RefCell { value: 15 }, Nil)
+<p>We create a value that's an instance of <code>Rc&lt;RefCell&lt;i32&gt;</code> and store it in a
+variable named <code>value</code> so we can access it directly later. Then we create a
+<code>List</code> in <code>a</code> with a <code>Cons</code> variant that holds <code>value</code>. We need to clone
+<code>value</code> so that both <code>a</code> and <code>value</code> have ownership of the inner <code>5</code> value,
+rather than transferring ownership from <code>value</code> to <code>a</code> or having <code>a</code> borrow
+from <code>value</code>.</p>
+<!-- above: so that `value` has ownership of what, in addition to a? I didn't
+follow the final sentence above -->
+<!-- Of the inner value, I've tried to clarify /Carol -->
+<p>We wrap the list <code>a</code> in an <code>Rc&lt;T&gt;</code> so that when we create lists <code>b</code> and
+<code>c</code>, they can both refer to <code>a</code>, the same as we did in Listing 15-13.</p>
+<p>Once we have the lists in <code>a</code>, <code>b</code>, and <code>c</code> created, we add 10 to the value in
+<code>value</code> by dereferencing the <code>Rc&lt;T&gt;</code> and calling <code>borrow_mut</code> on the <code>RefCell</code>.</p>
+<p>When we print out <code>a</code>, <code>b</code>, and <code>c</code>, we can see that they all have the modified
+value of 15 rather than 5:</p>
+<pre><code class="language-text">a after = Cons(RefCell { value: 15 }, Nil)
 b after = Cons(RefCell { value: 6 }, Cons(RefCell { value: 15 }, Nil))
 c after = Cons(RefCell { value: 10 }, Cons(RefCell { value: 15 }, Nil))
 </code></pre>
-<p>This is pretty neat! By using <code>RefCell&lt;T&gt;</code>, we can have an outwardly immutable
+<p>This is pretty neat! By using <code>RefCell&lt;T&gt;</code>, we have an outwardly immutable
 <code>List</code>, but we can use the methods on <code>RefCell&lt;T&gt;</code> that provide access to its
-interior mutability to be able to modify our data when we need to. The runtime
-checks of the borrowing rules that <code>RefCell&lt;T&gt;</code> does protect us from data
-races, and we’ve decided that we want to trade a bit of speed for the
-flexibility in our data structures.</p>
-<p><code>RefCell&lt;T&gt;</code> is not the only standard library type that provides interior
-mutability. <code>Cell&lt;T&gt;</code> is similar but instead of giving references to the inner
-value like <code>RefCell&lt;T&gt;</code> does, the value is copied in and out of the <code>Cell&lt;T&gt;</code>.
-<code>Mutex&lt;T&gt;</code> offers interior mutability that is safe to use across threads, and
-we’ll be discussing its use in the next chapter on concurrency. Check out the
-standard library docs for more details on the differences between these types.</p>
+interior mutability so we can modify our data when we need to. The runtime
+checks of the borrowing rules protect us from data races, and it's sometimes
+worth trading a bit of speed for this flexibility in our data structures.</p>
+<p>The standard library has other types that provide interior mutability, too,
+like <code>Cell&lt;T&gt;</code>, which is similar except that instead of giving references to
+the inner value, the value is copied in and out of the <code>Cell&lt;T&gt;</code>. There's also
+<code>Mutex&lt;T&gt;</code>, which offers interior mutability that's safe to use across threads,
+and we'll be discussing its use in the next chapter on concurrency. Check out
+the standard library docs for more details on the differences between these
+types.</p>
 <a class="header" href="print.html#creating-reference-cycles-and-leaking-memory-is-safe" id="creating-reference-cycles-and-leaking-memory-is-safe"><h2>Creating Reference Cycles and Leaking Memory is Safe</h2></a>
 <p>Rust makes a number of guarantees that we’ve talked about, for example that
 we’ll never have a null value, and data races will be disallowed at compile
@@ -19855,7 +20085,7 @@ be explicit.</li>
 <p>When we must be explicit, we can add a lifetime bound on a trait object like
 <code>Box&lt;Foo&gt;</code> with the syntax <code>Box&lt;Foo + 'a&gt;</code> or <code>Box&lt;Foo + 'static&gt;</code>, depending
 on what’s needed. Just as with the other bounds, this means that any
-implementer of the <code>Foo</code> trait that has any references inside must have the
+implementor of the <code>Foo</code> trait that has any references inside must have the
 lifetime specified in the trait object bounds as those references.</p>
 <p>Next, let’s take a look at some other advanced features dealing with traits!</p>
 <a class="header" href="print.html#advanced-traits" id="advanced-traits"><h2>Advanced Traits</h2></a>
@@ -19864,7 +20094,7 @@ details. Now that we know more Rust, we can get into the nitty-gritty.</p>
 <a class="header" href="print.html#associated-types" id="associated-types"><h3>Associated Types</h3></a>
 <p><em>Associated types</em> are a way of associating a type placeholder with a trait
 such that the trait method definitions can use these placeholder types in their
-signatures. The implementer of a trait will specify the concrete type to be
+signatures. The implementor of a trait will specify the concrete type to be
 used in this type’s place for the particular implementation.</p>
 <p>We’ve described most of the things in this chapter as being very rare.
 Associated types are somewhere in the middle; they’re more rare than the rest
@@ -19885,9 +20115,9 @@ pub trait Iterator {
 that has an associated type <code>Item</code></span></p>
 <p>This says that the <code>Iterator</code> trait has an associated type named <code>Item</code>. <code>Item</code>
 is a placeholder type, and the return value of the <code>next</code> method will return
-values of type <code>Option&lt;Self::Item&gt;</code>. Implementers of this trait will specify
+values of type <code>Option&lt;Self::Item&gt;</code>. Implementors of this trait will specify
 the concrete type for <code>Item</code>, and the <code>next</code> method will return an <code>Option</code>
-containing a value of whatever type the implementer has specified.</p>
+containing a value of whatever type the implementor has specified.</p>
 <a class="header" href="print.html#associated-types-versus-generics" id="associated-types-versus-generics"><h4>Associated Types Versus Generics</h4></a>
 <p>When we implemented the <code>Iterator</code> trait on the <code>Counter</code> struct in Listing
 13-6, we specified that the <code>Item</code> type was <code>u32</code>:</p>
@@ -21262,7 +21492,7 @@ fn handle_connection(mut stream: TcpStream) {
 #     let get = b&quot;GET / HTTP/1.1\r\n&quot;;
     // ...snip...
 
-   let (status_line, filename) = if buffer.starts_with(get) {
+    let (status_line, filename) = if buffer.starts_with(get) {
         (&quot;HTTP/1.1 200 OK\r\n\r\n&quot;, &quot;hello.html&quot;)
     } else {
         (&quot;HTTP/1.1 404 NOT FOUND\r\n\r\n&quot;, &quot;404.html&quot;)

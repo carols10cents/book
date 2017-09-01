@@ -140,7 +140,7 @@ details. Now that we know more Rust, we can get into the nitty-gritty.</p>
 <a class="header" href="ch19-03-advanced-traits.html#associated-types" id="associated-types"><h3>Associated Types</h3></a>
 <p><em>Associated types</em> are a way of associating a type placeholder with a trait
 such that the trait method definitions can use these placeholder types in their
-signatures. The implementer of a trait will specify the concrete type to be
+signatures. The implementor of a trait will specify the concrete type to be
 used in this type’s place for the particular implementation.</p>
 <p>We’ve described most of the things in this chapter as being very rare.
 Associated types are somewhere in the middle; they’re more rare than the rest
@@ -161,9 +161,9 @@ pub trait Iterator {
 that has an associated type <code>Item</code></span></p>
 <p>This says that the <code>Iterator</code> trait has an associated type named <code>Item</code>. <code>Item</code>
 is a placeholder type, and the return value of the <code>next</code> method will return
-values of type <code>Option&lt;Self::Item&gt;</code>. Implementers of this trait will specify
+values of type <code>Option&lt;Self::Item&gt;</code>. Implementors of this trait will specify
 the concrete type for <code>Item</code>, and the <code>next</code> method will return an <code>Option</code>
-containing a value of whatever type the implementer has specified.</p>
+containing a value of whatever type the implementor has specified.</p>
 <a class="header" href="ch19-03-advanced-traits.html#associated-types-versus-generics" id="associated-types-versus-generics"><h4>Associated Types Versus Generics</h4></a>
 <p>When we implemented the <code>Iterator</code> trait on the <code>Counter</code> struct in Listing
 13-6, we specified that the <code>Item</code> type was <code>u32</code>:</p>

@@ -213,7 +213,7 @@ also define an <code>Item</code> type, and this <code>Item</code> type is used i
 the <code>next</code> method. In other words, the <code>Item</code> type will be the type of element
 that’s returned from the iterator.</p>
 <p>The <code>next</code> method is the only method that the <code>Iterator</code> trait requires
-implementers of the trait to define. <code>next</code> returns one item of the iterator
+implementors of the trait to define. <code>next</code> returns one item of the iterator
 at a time wrapped in <code>Some</code>, and when iteration is over, it returns <code>None</code>.
 We can call the <code>next</code> method on iterators directly if we’d like; Listing 13-15
 has a test that demonstrates the values we’d get on repeated calls to <code>next</code>

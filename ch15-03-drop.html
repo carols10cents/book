@@ -233,7 +233,7 @@ releases the lock to run so that other code in the same scope can acquire the
 lock. First, let's see what happens if we try to call the <code>Drop</code> trait's <code>drop</code>
 method ourselves by modifying the <code>main</code> function from Listing 15-8 as shown in
 Listing 15-9:</p>
-<!-- Above: I'm not following why we are doing this, if it's not necesary and
+<!-- Above: I'm not following why we are doing this, if it's not necessary and
 we aren't going to cover it now anyway -- can you lay out why we're discussing
 this here? -->
 <!-- Done. /Carol -->
@@ -256,7 +256,7 @@ the <code>Drop</code> trait manually to clean up early</span></p>
 </code></pre>
 <p>This error message says we're not allowed to explicitly call <code>drop</code>. The error
 message uses the term <em>destructor</em>, which is the general programming term for a
-function that cleans up an instance. A <em>destructor</em> is analagous to a
+function that cleans up an instance. A <em>destructor</em> is analogous to a
 <em>constructor</em> that creates an instance. The <code>drop</code> function in Rust is one
 particular destructor.</p>
 <p>Rust doesn't let us call <code>drop</code> explicitly because Rust would still

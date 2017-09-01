@@ -167,7 +167,7 @@ of pointer that only borrow data; by contrast, in many cases, smart pointers
 <p>We've actually already encountered a few smart pointers in this book, such as
 <code>String</code> and <code>Vec&lt;T&gt;</code> from Chapter 8, though we didn't call them smart pointers
 at the time. Both these types count as smart pointers because they own some
-memory and allow you to manipulate it. They also havemetadata (such as their
+memory and allow you to manipulate it. They also have metadata (such as their
 capacity) and extra capabilities or guarantees (such as <code>String</code> ensuring its
 data will always be valid UTF-8).</p>
 <!-- Above: we said smart pointers don't own values earlier but in the
@@ -177,7 +177,7 @@ contradiction? -->
 references and smart pointers is that references are a kind of pointer that
 only borrow data; by contrast, in many cases, smart pointers *own* the data
 that they point to." You had edited this to say the opposite: "In Rust, smart
-pointers can only borrow data, whereas in many other langauges, smart pointers
+pointers can only borrow data, whereas in many other languages, smart pointers
 *own* the data they point to." We had the "in rust" phrase not to distinguish
 Rust's smart pointer implementation from other languages' smart pointer
 implementations, but to acknowledge that the concept of borrowing and ownership

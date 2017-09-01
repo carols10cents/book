@@ -151,15 +151,15 @@ different way in the below paragraph /Carol -->
 define our own type like <code>Box&lt;T&gt;</code> and see why <code>*</code> doesn't work like a
 reference. We'll explore how implementing the <code>Deref</code> trait makes it possible
 for smart pointers to work in a similar way as references. Finally, we'll look
-at the <em>deref coersion</em> feature of Rust and how that lets us work with either
-references or smart pointors.</p>
+at the <em>deref coercion</em> feature of Rust and how that lets us work with either
+references or smart pointers.</p>
 <a class="header" href="ch15-02-deref.html#following-the-pointer-to-the-value-with-" id="following-the-pointer-to-the-value-with-"><h3>Following the Pointer to the Value with <code>*</code></h3></a>
 <!-- I want to avoid too much cross referencing, I think it can be distracting,
 make the reader feel they need to flip back but they don't really, here -->
 <!-- Ok, guess we went too far then! I've been adding *more* cross referencing
 so that the reader can go back if they've forgotten something we've already
 covered. /Carol -->
-<!--Oh! I see, de-reference, meaning we cut the tie betweewn the data and the
+<!--Oh! I see, de-reference, meaning we cut the tie between the data and the
 reference? I've assumed so above, please correct if not! -->
 <!-- I wouldn't describe it as "cutting the tie"; the tie is still there. It's
 more like we're following an arrow (the pointer) to find the value. Let us know
@@ -271,7 +271,7 @@ dereference <code>MyBox</code>:</p>
 </code></pre>
 <p><span class="caption">Listing 15-11: Attempting to use <code>MyBox&lt;T&gt;</code> in the same
 way we were able to use references and <code>Box&lt;T&gt;</code></span></p>
-<p>The compliation error we get is:</p>
+<p>The compilation error we get is:</p>
 <pre><code class="language-text">error: type `MyBox&lt;{integer}&gt;` cannot be dereferenced
   --&gt; src/main.rs:14:19
    |
@@ -350,7 +350,7 @@ describe it as implicit. /Carol -->
 <p>Rust tends to favor explicitness over implicitness, but one exception is deref
 coercions of arguments to functions and methods. Rust performs <em>deref coercion</em>
 to convert a reference to a type that implements <code>Deref</code> into a reference to a
-type that <code>Deref</code> can convert the original type into. Deref coersion happens
+type that <code>Deref</code> can convert the original type into. Deref coercion happens
 automatically when we pass a reference to a value of a particular type as an
 argument to a function or method that doesn't match the type of the parameter
 in the function or method definition, and there's a sequence of calls to the
@@ -415,7 +415,7 @@ by calling <code>deref</code>. The standard library provides an implementation o
 on <code>String</code> that returns a string slice, which we can see in the API
 documentation for <code>Deref</code>. Rust calls <code>deref</code> again to turn the <code>&amp;String</code> into
 <code>&amp;str</code>, which matches the <code>hello</code> function's definition.</p>
-<p>If Rust didn't implement deref coersion, in order to call <code>hello</code> with a value
+<p>If Rust didn't implement deref coercion, in order to call <code>hello</code> with a value
 of type <code>&amp;MyBox&lt;String&gt;</code>, we'd have to write the code in Listing 15-15 instead
 of the code in Listing 15-14:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
@@ -472,7 +472,8 @@ references, Rust provides a <code>DerefMut</code> trait for overriding <code>*</
 references.</p>
 <p>Rust does deref coercion when it finds types and trait implementations in three
 cases:</p>
-<!-- Would it make sense to move this list to the start of the deref setion? -->
+<!-- Would it make sense to move this list to the start of the deref section?
+-->
 <!-- I don't think this list makes very much sense until you understand what
 deref coercion *is*. Can you elaborate on why you think it should be moved to
 the beginning? /Carol -->
