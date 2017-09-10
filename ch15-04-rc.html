@@ -221,7 +221,7 @@ data in that <code>Rc</code>. We also clone <code>a</code> when creating <code>c
 number of references from 2 to 3. Every time we call <code>Rc::clone</code>, the reference
 count to the data within the <code>Rc</code> is increased, and the data won't be cleaned
 up unless there are zero references to it:</p>
-<!-- And what will Rc do that's different here, how will the ownerships of a b
+<!-- And what will Rc do that's different here, how will the ownership of a b
 c change? Could you write a paragraph equivalent to the one describing the cons
 variants above? That was really useful -->
 <!-- I'm not sure which paragraph about cons you're talking about, but I've
