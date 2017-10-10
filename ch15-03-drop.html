@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>The `Drop` Trait Runs Code on Cleanup - The Rust Programming Language</title>
+        <title>The `Drop` Trait Runs Code on Cleanup - The `Drop` Trait Runs Code on Cleanup - The Rust Programming Language</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,8 @@
         <base href="">
 
         <link rel="stylesheet" href="book.css">
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
 
         <link rel="shortcut icon" href="favicon.png">
 
@@ -19,6 +20,11 @@
 
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
         <style>
             .page-wrapper.has-warning > .nav-chapters {
               /* add height for warning content & margin */
@@ -85,8 +91,15 @@
             }
         </style>
 
-        <!-- MathJax -->
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
 
         <!-- Fetch JQuery from CDN but have a local fallback -->
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -95,18 +108,25 @@
                 document.write(unescape("%3Cscript src='jquery.js'%3E%3C/script%3E"));
             }
         </script>
+
+        <!-- Fetch store.js from local - TODO add CDN when 2.x.x is available on cdnjs -->
+        <script src="store.js"></script>
+
+        <!-- Custom JS script -->
+        
+
     </head>
     <body class="light">
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script type="text/javascript">
-            var theme = localStorage.getItem('theme');
-            if (theme == null) { theme = 'light'; }
+            var theme = store.get('theme');
+            if (theme === null || theme === undefined) { theme = 'light'; }
             $('body').removeClass().addClass(theme);
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script type="text/javascript">
-            var sidebar = localStorage.getItem('sidebar');
+            var sidebar = store.get('sidebar');
             if (sidebar === "hidden") { $("html").addClass("sidebar-hidden") }
             else if (sidebar === "visible") { $("html").addClass("sidebar-visible") }
         </script>
@@ -117,7 +137,7 @@
 
         <div id="page-wrapper" class="page-wrapper has-warning">
 
-            <div class="page">
+            <div class="page" tabindex="-1">
                 <header><p class="warning">You are reading a <strong>draft</strong> of the next edition of TRPL. For more, go <a href="../index.html">here</a>.</p></header>
                 <div id="menu-bar" class="menu-bar">
                     <div class="left-buttons">
@@ -132,14 +152,13 @@
                     </div>
                 </div>
 
-
                 <div id="content" class="content">
                     <a class="header" href="ch15-03-drop.html#the-drop-trait-runs-code-on-cleanup" id="the-drop-trait-runs-code-on-cleanup"><h2>The <code>Drop</code> Trait Runs Code on Cleanup</h2></a>
 <p>The second trait important to the smart pointer pattern is <code>Drop</code>, which lets
 us customize what happens when a value is about to go out of scope. We can
 provide an implementation for the <code>Drop</code> trait on any type, and the code we
 specify can be used to release resources like files or network connections.
-We're introducing <code>Drop</code> in the context of smart pointers because the
+We’re introducing <code>Drop</code> in the context of smart pointers because the
 functionality of the <code>Drop</code> trait is almost always used when implementing a
 smart pointer. For example, <code>Box&lt;T&gt;</code> customizes <code>Drop</code> in order to deallocate
 the space on the heap that the box points to.</p>
@@ -152,13 +171,13 @@ the compiler will insert this code automatically.</p>
 up, or that this code that can be run is specifically always for clean up? -->
 <!-- I don't understand what the difference between those two choices are?
 /Carol -->
-<p>This means we don't need be careful about placing clean up code everywhere in a
-program that an instance of a particular type is finished with, but we still
-won't leak resources!</p>
+<p>This means we don’t need to be careful about placing clean up code everywhere
+in a program that an instance of a particular type is finished with, but we
+still won’t leak resources!</p>
 <p>We specify the code to run when a value goes out of scope by implementing the
 <code>Drop</code> trait. The <code>Drop</code> trait requires us to implement one method named <code>drop</code>
 that takes a mutable reference to <code>self</code>. In order to be able to see when Rust
-calls <code>drop</code>, let's implement <code>drop</code> with <code>println!</code> statements for now.</p>
+calls <code>drop</code>, let’s implement <code>drop</code> with <code>println!</code> statements for now.</p>
 <!-- Why are we showing this as an example and not an example of it being used
 for clean up? -->
 <!-- To demonstrate the mechanics of implementing the trait and showing when
@@ -183,22 +202,23 @@ automatically. We're building up to cleaning up. /Carol -->
 
 impl Drop for CustomSmartPointer {
     fn drop(&amp;mut self) {
-        println!(&quot;Dropping CustomSmartPointer!&quot;);
+        println!(&quot;Dropping CustomSmartPointer with data `{}`!&quot;, self.data);
     }
 }
 
 fn main() {
-    let c = CustomSmartPointer { data: String::from(&quot;some data&quot;) };
-    println!(&quot;CustomSmartPointer created.&quot;);
+    let c = CustomSmartPointer { data: String::from(&quot;my stuff&quot;) };
+    let d = CustomSmartPointer { data: String::from(&quot;other stuff&quot;) };
+    println!(&quot;CustomSmartPointers created.&quot;);
 }
 </code></pre></pre>
 <p><span class="caption">Listing 15-8: A <code>CustomSmartPointer</code> struct that
 implements the <code>Drop</code> trait, where we would put our clean up code.</span></p>
-<p>The <code>Drop</code> trait is included in the prelude, so we don't need to import it. We
+<p>The <code>Drop</code> trait is included in the prelude, so we don’t need to import it. We
 implement the <code>Drop</code> trait on <code>CustomSmartPointer</code>, and provide an
 implementation for the <code>drop</code> method that calls <code>println!</code>. The body of the
-<code>drop</code> function is where you'd put any logic that you wanted to run when an
-instance of your type goes out of scope. We're choosing to print out some text
+<code>drop</code> function is where you’d put any logic that you wanted to run when an
+instance of your type goes out of scope. We’re choosing to print out some text
 here in order to demonstrate when Rust will call <code>drop</code>.</p>
 <!-- Where you'd put this code, or where this code would be called? It seems
 laborious to write this clean up code wherever there's a print call? -->
@@ -207,16 +227,19 @@ elaborate? /Carol -->
 <p>In <code>main</code>, we create a new instance of <code>CustomSmartPointer</code> and then print out
 <code>CustomSmartPointer created.</code>. At the end of <code>main</code>, our instance of
 <code>CustomSmartPointer</code> will go out of scope, and Rust will call the code we put
-in the <code>drop</code> method, printing our final message. Note that we didn't need to
+in the <code>drop</code> method, printing our final message. Note that we didn’t need to
 call the <code>drop</code> method explicitly.</p>
-<p>When we run this program, we'll see the following output:</p>
-<pre><code class="language-text">CustomSmartPointer created.
-Dropping CustomSmartPointer!
+<p>When we run this program, we’ll see the following output:</p>
+<pre><code class="language-text">CustomSmartPointers created.
+Dropping CustomSmartPointer with data `other stuff`!
+Dropping CustomSmartPointer with data `my stuff`!
 </code></pre>
 <p>Rust automatically called <code>drop</code> for us when our instance went out of scope,
-calling the code we specified. This is just to give you a visual guide to how
-the drop method works, but usually you would specify the cleanup code that your
-type needs to run rather than a print message.</p>
+calling the code we specified. Variables are dropped in the reverse order of
+the order in which they were created, so <code>d</code> was dropped before <code>c</code>. This is
+just to give you a visual guide to how the drop method works, but usually you
+would specify the cleanup code that your type needs to run rather than a print
+message.</p>
 <!-- Can you wrap this example up by saying what you would actually put in a
 drop method and why?-->
 <!-- Done /Carol -->
@@ -224,15 +247,14 @@ drop method and why?-->
 <!-- is this a new method from Drop or the same method? -->
 <!-- This is a new function. /Carol -->
 <p>Rust inserts the call to <code>drop</code> automatically when a value goes out of scope,
-and there's no way to disable this functionality if we want to force a value to
-clean itself up early. This isn't usually necessary; the whole point of the
-<code>Drop</code> trait is that it's taken care of automatically for us. Occasionally you
-may find that you want to clean up a value early. One example is when using
-smart pointers that manage locks; you may want to force the <code>drop</code> method that
-releases the lock to run so that other code in the same scope can acquire the
-lock. First, let's see what happens if we try to call the <code>Drop</code> trait's <code>drop</code>
-method ourselves by modifying the <code>main</code> function from Listing 15-8 as shown in
-Listing 15-9:</p>
+and it’s not straightforward to disable this functionality. Disabling <code>drop</code>
+isn’t usually necessary; the whole point of the <code>Drop</code> trait is that it’s taken
+care of automatically for us. Occasionally you may find that you want to clean
+up a value early. One example is when using smart pointers that manage locks;
+you may want to force the <code>drop</code> method that releases the lock to run so that
+other code in the same scope can acquire the lock. First, let’s see what
+happens if we try to call the <code>Drop</code> trait’s <code>drop</code> method ourselves by
+modifying the <code>main</code> function from Listing 15-8 as shown in Listing 15-9:</p>
 <!-- Above: I'm not following why we are doing this, if it's not necessary and
 we aren't going to cover it now anyway -- can you lay out why we're discussing
 this here? -->
@@ -247,24 +269,24 @@ this here? -->
 </code></pre>
 <p><span class="caption">Listing 15-9: Attempting to call the <code>drop</code> method from
 the <code>Drop</code> trait manually to clean up early</span></p>
-<p>If we try to compile this, we'll get this error:</p>
+<p>If we try to compile this, we’ll get this error:</p>
 <pre><code class="language-text">error[E0040]: explicit use of destructor method
   --&gt; src/main.rs:15:7
    |
 15 |     c.drop();
    |       ^^^^ explicit destructor calls not allowed
 </code></pre>
-<p>This error message says we're not allowed to explicitly call <code>drop</code>. The error
+<p>This error message says we’re not allowed to explicitly call <code>drop</code>. The error
 message uses the term <em>destructor</em>, which is the general programming term for a
 function that cleans up an instance. A <em>destructor</em> is analogous to a
 <em>constructor</em> that creates an instance. The <code>drop</code> function in Rust is one
 particular destructor.</p>
-<p>Rust doesn't let us call <code>drop</code> explicitly because Rust would still
+<p>Rust doesn’t let us call <code>drop</code> explicitly because Rust would still
 automatically call <code>drop</code> on the value at the end of <code>main</code>, and this would be
 a <em>double free</em> error since Rust would be trying to clean up the same value
 twice.</p>
-<p>Because we can't disable the automatic insertion of <code>drop</code> when a value goes
-out of scope, and we can't call the <code>drop</code> method explicitly, if we need to
+<p>Because we can’t disable the automatic insertion of <code>drop</code> when a value goes
+out of scope, and we can’t call the <code>drop</code> method explicitly, if we need to
 force a value to be cleaned up early, we can use the <code>std::mem::drop</code> function.</p>
 <p>The <code>std::mem::drop</code> function is different than the <code>drop</code> method in the <code>Drop</code>
 trait. We call it by passing the value we want to force to be dropped early as
@@ -307,28 +329,28 @@ this correct, above?-->
 /Carol-->
 <p>Code specified in a <code>Drop</code> trait implementation can be used in many ways to
 make cleanup convenient and safe: we could use it to create our own memory
-allocator, for instance! With the <code>Drop</code> trait and Rust's ownership system, you
-don't have to remember to clean up after yourself, Rust takes care of it
+allocator, for instance! With the <code>Drop</code> trait and Rust’s ownership system, you
+don’t have to remember to clean up after yourself, Rust takes care of it
 automatically.</p>
-<p>We also don't have to worry about accidentally cleaning up values still in use
+<p>We also don’t have to worry about accidentally cleaning up values still in use
 because that would cause a compiler error: the ownership system that makes sure
 references are always valid will also make sure that <code>drop</code> only gets called
 once when the value is no longer being used.</p>
-<p>Now that we've gone over <code>Box&lt;T&gt;</code> and some of the characteristics of smart
-pointers, let's talk about a few other smart pointers defined in the standard
+<p>Now that we’ve gone over <code>Box&lt;T&gt;</code> and some of the characteristics of smart
+pointers, let’s talk about a few other smart pointers defined in the standard
 library.</p>
 
                 </div>
 
                 <!-- Mobile navigation buttons -->
                 
-                    <a href="ch15-02-deref.html" class="mobile-nav-chapters previous">
+                    <a rel="prev" href="ch15-02-deref.html" class="mobile-nav-chapters previous">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a href="ch15-04-rc.html" class="mobile-nav-chapters next">
+                    <a rel="next" href="ch15-04-rc.html" class="mobile-nav-chapters next">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -360,8 +382,11 @@ library.</p>
         <!-- Livereload script (if served using the cli tool) -->
         
 
+        
+
+        
+
         <script src="highlight.js"></script>
-        <script src="store.js"></script>
         <script src="book.js"></script>
     </body>
 </html>

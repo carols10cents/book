@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>`Box&lt;T&gt;` Points to Data on the Heap and Has a Known Size - The Rust Programming Language</title>
+        <title>`Box&lt;T&gt;` Points to Data on the Heap and Has a Known Size - `Box&lt;T&gt;` Points to Data on the Heap and Has a Known Size - The Rust Programming Language</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,8 @@
         <base href="">
 
         <link rel="stylesheet" href="book.css">
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
 
         <link rel="shortcut icon" href="favicon.png">
 
@@ -19,6 +20,11 @@
 
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
         <style>
             .page-wrapper.has-warning > .nav-chapters {
               /* add height for warning content & margin */
@@ -85,8 +91,15 @@
             }
         </style>
 
-        <!-- MathJax -->
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
 
         <!-- Fetch JQuery from CDN but have a local fallback -->
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -95,18 +108,25 @@
                 document.write(unescape("%3Cscript src='jquery.js'%3E%3C/script%3E"));
             }
         </script>
+
+        <!-- Fetch store.js from local - TODO add CDN when 2.x.x is available on cdnjs -->
+        <script src="store.js"></script>
+
+        <!-- Custom JS script -->
+        
+
     </head>
     <body class="light">
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script type="text/javascript">
-            var theme = localStorage.getItem('theme');
-            if (theme == null) { theme = 'light'; }
+            var theme = store.get('theme');
+            if (theme === null || theme === undefined) { theme = 'light'; }
             $('body').removeClass().addClass(theme);
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script type="text/javascript">
-            var sidebar = localStorage.getItem('sidebar');
+            var sidebar = store.get('sidebar');
             if (sidebar === "hidden") { $("html").addClass("sidebar-hidden") }
             else if (sidebar === "visible") { $("html").addClass("sidebar-visible") }
         </script>
@@ -117,7 +137,7 @@
 
         <div id="page-wrapper" class="page-wrapper has-warning">
 
-            <div class="page">
+            <div class="page" tabindex="-1">
                 <header><p class="warning">You are reading a <strong>draft</strong> of the next edition of TRPL. For more, go <a href="../index.html">here</a>.</p></header>
                 <div id="menu-bar" class="menu-bar">
                     <div class="left-buttons">
@@ -132,39 +152,39 @@
                     </div>
                 </div>
 
-
                 <div id="content" class="content">
                     <a class="header" href="ch15-01-box.html#boxt-points-to-data-on-the-heap-and-has-a-known-size" id="boxt-points-to-data-on-the-heap-and-has-a-known-size"><h2><code>Box&lt;T&gt;</code> Points to Data on the Heap and Has a Known Size</h2></a>
 <p>The most straightforward smart pointer is a <em>box</em>, whose type is written
-<code>Box&lt;T&gt;</code>. Boxes allow you to store a value on the heap rather than the stack.
-The box data consisting of the pointer to the heap will be stored on the stack.
-Refer back to Chapter 4 if you'd like to review the difference between the
-stack and the heap.</p>
+<code>Box&lt;T&gt;</code>. Boxes allow you to store data on the heap rather than the stack. What
+remains on the stack is the pointer to the heap data. Refer back to Chapter 4
+if you’d like to review the difference between the stack and the heap.</p>
 <!-- do we mean, allows you to place a value on the heap rather than the
 default behavior of placing it on the stack? Can you quickly recap on what the
 advantage to this can be, help them know when they'd use this? -->
 <!-- Correct! Recap below: /Carol -->
-<p>Boxes don't have a lot of performance overhead, but they don't have a lot of
-extra abilities either. They're most often used in these situations:</p>
+<p>Boxes don’t have performance overhead other than their data being on the heap
+instead of on the stack, but they don’t have a lot of extra abilities either.
+They’re most often used in these situations:</p>
 <ul>
-<li>When you have a type whose size can't be known at compile time, and you want
+<li>When you have a type whose size can’t be known at compile time, and you want
 to use a value of that type in a context that needs to know an exact size</li>
 <li>When you have a large amount of data and you want to transfer ownership but
-ensure the data won't be copied when you do so</li>
-<li>When you want to own a value and only care that it's a type that implements a
+ensure the data won’t be copied when you do so</li>
+<li>When you want to own a value and only care that it’s a type that implements a
 particular trait rather than knowing the concrete type itself</li>
 </ul>
-<p>We're going to demonstrate the first case in the rest of this section. To
-elaborate on the other two situations a bit more: in the second case when you
-have a lot of data that you don't want to be copied when you move the value to
-be owned by another part of code, boxes make it so that the data stays in one
-place on the heap and only the pointer data in the box is copied around on the
-stack. The third case is known as a <em>trait object</em>, and Chapter 17 has an entire
-section devoted just to that topic. So know that what you learn here will be
-applied again in Chapter 17!</p>
-<a class="header" href="ch15-01-box.html#using-a-box-to-store-data-on-the-heap" id="using-a-box-to-store-data-on-the-heap"><h3>Using a <code>Box</code> to Store Data on the Heap</h3></a>
-<p>Before we get into a use case for <code>Box</code>, let's get familiar with the syntax and
-how to interact with values stored within a <code>Box</code>.</p>
+<p>We’re going to demonstrate the first case in the rest of this section. To
+elaborate on the other two situations a bit more: in the second case,
+transferring ownership of a large amount of data can take a long time because
+the data gets copied around on the stack. To improve performance in this
+situation, we can store the large amount of data on the heap in a box. Then,
+only the small amount of pointer data is copied around on the stack, and the
+data stays in one place on the heap. The third case is known as a <em>trait
+object</em>, and Chapter 17 has an entire section devoted just to that topic. So
+know that what you learn here will be applied again in Chapter 17!</p>
+<a class="header" href="ch15-01-box.html#using-a-boxt-to-store-data-on-the-heap" id="using-a-boxt-to-store-data-on-the-heap"><h3>Using a <code>Box&lt;T&gt;</code> to Store Data on the Heap</h3></a>
+<p>Before we get into a use case for <code>Box&lt;T&gt;</code>, let’s get familiar with the syntax
+and how to interact with values stored within a <code>Box&lt;T&gt;</code>.</p>
 <p>Listing 15-1 shows how to use a box to store an <code>i32</code> on the heap:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
 <pre><pre class="playpen"><code class="language-rust">fn main() {
@@ -183,9 +203,9 @@ deallocated. The deallocation happens for both the box (stored on the stack)
 and the data it points to (stored on the heap).</p>
 <p>Putting a single value on the heap isn’t very useful, so you won’t use boxes by
 themselves in the way that Listing 15-1 does very often. Having values like a
-single <code>i32</code> on the stack, where they're stored by default is more appropriate
-in the majority of cases. Let's get into a case where boxes allow us to define
-types that we wouldn't be allowed to if we didn't have boxes.</p>
+single <code>i32</code> on the stack, where they’re stored by default is more appropriate
+in the majority of cases. Let’s get into a case where boxes allow us to define
+types that we wouldn’t be allowed to if we didn’t have boxes.</p>
 <!-- is this what we mean, we wouldn't bother with a box for something that can
 be done more simply with a variable? -->
 <!-- No, this doesn't really have anything to do with variables; this example
@@ -198,14 +218,14 @@ next **item**, or the next **value**? Is it a continually nesting list? I'm
 finding it hard to visualize -->
 <!-- Did Figure 15-4 (trpl15-01.svg that I sent) help at all? /Carol-->
 <p>Rust needs to know at compile time how much space a type takes up. One kind of
-type whose size can't be known at compile time is a <em>recursive type</em> where a
+type whose size can’t be known at compile time is a <em>recursive type</em> where a
 value can have as part of itself another value of the same type. This nesting
-of values could theoretically continue infinitely, so Rust doesn't know how
+of values could theoretically continue infinitely, so Rust doesn’t know how
 much space a value of a recursive type needs. Boxes have a known size, however,
 so by inserting a box in a recursive type definition, we are allowed to have
 recursive types.</p>
-<p>Let's explore the <em>cons list</em>, a data type common in functional programming
-languages, to illustrate this concept. The cons list type we're going to define
+<p>Let’s explore the <em>cons list</em>, a data type common in functional programming
+languages, to illustrate this concept. The cons list type we’re going to define
 is straightforward except for the recursion, so the concepts in this example
 will be useful any time you get into more complex situations involving
 recursive types.</p>
@@ -238,7 +258,7 @@ announces the end of the list. Note that this is not the same as the “null”
 or “nil” concept from Chapter 6, which is an invalid or absent value.</p>
 </blockquote>
 <p>Note that while functional programming languages use cons lists frequently,
-this isn't a commonly used data structure in Rust. Most of the time when you
+this isn’t a commonly used data structure in Rust. Most of the time when you
 have a list of items in Rust, <code>Vec&lt;T&gt;</code> is a better choice. Other, more complex
 recursive data types <em>are</em> useful in various situations in Rust, but by
 starting with the cons list, we can explore how boxes let us define a recursive
@@ -252,8 +272,8 @@ that the reader can use these concepts in more complicated situations. A more
 realistic example would be quite a bit more complicated and obscure why a box
 is useful even more. /Carol -->
 <p>Listing 15-2 contains an enum definition for a cons list. Note that this
-won’t compile quite yet because this is type doesn't have a known size, which
-we'll demonstrate:</p>
+won’t compile quite yet because this is type doesn’t have a known size, which
+we’ll demonstrate:</p>
 <!-- why won't it compile? Are we just defining it to use in the next example?
 Can you make it clear to the reader why they are doing this?-->
 <!-- done /Carol -->
@@ -266,7 +286,7 @@ Can you make it clear to the reader why they are doing this?-->
 <p><span class="caption">Listing 15-2: The first attempt of defining an enum to
 represent a cons list data structure of <code>i32</code> values</span></p>
 <blockquote>
-<p>Note: We're choosing to implement a cons list that only holds <code>i32</code> values
+<p>Note: We’re choosing to implement a cons list that only holds <code>i32</code> values
 for the purposes of this example. We could have implemented it using
 generics, as we discussed in Chapter 10, in order to define a cons list type
 that could store values of any type.</p>
@@ -311,7 +331,7 @@ cons definition at the moment! -->
 to a Rust type, but it's not allowed in Rust. We have to use box to make the
 variant hold a pointer to the next value, not the actual value itself. We've
 tried to clarify throughout this section. /Carol -->
-<p>The error says this type 'has infinite size'. The reason is the way we've
+<p>The error says this type ‘has infinite size’. The reason is the way we’ve
 defined <code>List</code> is with a variant that is recursive: it holds another value of
 itself directly. This means Rust can’t figure out how much space it needs in
 order to store a <code>List</code> value. Let’s break this down a bit: first let’s look at
@@ -320,7 +340,8 @@ type.</p>
 <a class="header" href="ch15-01-box.html#computing-the-size-of-a-non-recursive-type" id="computing-the-size-of-a-non-recursive-type"><h3>Computing the Size of a Non-Recursive Type</h3></a>
 <p>Recall the <code>Message</code> enum we defined in Listing 6-2 when we discussed enum
 definitions in Chapter 6:</p>
-<pre><pre class="playpen"><code class="language-rust"># #![allow(unused_variables)]
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
 #fn main() {
 enum Message {
     Quit,
@@ -328,11 +349,10 @@ enum Message {
     Write(String),
     ChangeColor(i32, i32, i32),
 }
-
 #}</code></pre></pre>
 <p>To determine how much space to allocate for a <code>Message</code> value, Rust goes
 through each of the variants to see which variant needs the most space. Rust
-sees that <code>Message::Quit</code> does not need any space, <code>Message::Move</code> needs enough
+sees that <code>Message::Quit</code> doesn’t need any space, <code>Message::Move</code> needs enough
 space to store two <code>i32</code> values, and so forth. Since only one variant will end
 up being used, the most space a <code>Message</code> value will need is the space it would
 take to store the largest of its variants.</p>
@@ -354,17 +374,16 @@ helpful suggestion:</p>
 <pre><code class="language-text">= help: insert indirection (e.g., a `Box`, `Rc`, or `&amp;`) at some point to
         make `List` representable
 </code></pre>
-<p>In this suggestion, &quot;indirection&quot; means that instead of storing a value
-directly, we're going to store the value indirectly by storing a pointer to
+<p>In this suggestion, “indirection” means that instead of storing a value
+directly, we’re going to store the value indirectly by storing a pointer to
 the value instead.</p>
 <p>Because a <code>Box&lt;T&gt;</code> is a pointer, Rust always knows how much space a <code>Box&lt;T&gt;</code>
-needs: a pointer takes up a <code>usize</code> amount of space. The value of the <code>usize</code>
-will be the address of the heap data. The heap data can be any size, but the
-address to the start of that heap data will always fit in a <code>usize</code>.</p>
+needs: a pointer’s size doesn’t change based on the amount of data it’s
+pointing to.</p>
 <p>So we can put a <code>Box</code> inside the <code>Cons</code> variant instead of another <code>List</code> value
 directly. The <code>Box</code> will point to the next <code>List</code> value that will be on the
 heap, rather than inside the <code>Cons</code> variant. Conceptually, we still have a list
-created by lists &quot;holding&quot; other lists, but the way this concept is implemented
+created by lists “holding” other lists, but the way this concept is implemented
 is now more like the items being next to one another rather than inside one
 another.</p>
 <p>We can change the definition of the <code>List</code> enum from Listing 15-2 and the usage
@@ -386,12 +405,13 @@ fn main() {
 </code></pre></pre>
 <p><span class="caption">Listing 15-6: Definition of <code>List</code> that uses <code>Box&lt;T&gt;</code> in
 order to have a known size</span></p>
-<p>The <code>Cons</code> variant will need the size of an <code>i32</code> plus the space to store a
-<code>usize</code>, since a box always has the size of a <code>usize</code>, no matter what it's
-pointing to. The <code>Nil</code> variant stores no values and doesn't need any space. By
-using a box, we've broken the infinite, recursive chain so the compiler is able
-to figure out the size it needs to store a <code>List</code> value. Figure 15-7 shows what
-the <code>Cons</code> variant looks like now:</p>
+<p>The <code>Cons</code> variant will need the size of an <code>i32</code> plus the space to store the
+box’s pointer data. The <code>Nil</code> variant stores no values, so it needs less space
+than the <code>Cons</code> variant. We now know that any <code>List</code> value will take up the
+size of an <code>i32</code> plus the size of a box’s pointer data. By using a box, we’ve
+broken the infinite, recursive chain so the compiler is able to figure out the
+size it needs to store a <code>List</code> value. Figure 15-7 shows what the <code>Cons</code>
+variant looks like now:</p>
 <p><img alt="A finite Cons list" src="img/trpl15-02.svg" class="center" /></p>
 <p><span class="caption">Figure 15-7: A <code>List</code> that is not infinitely sized since
 <code>Cons</code> holds a <code>Box</code></span></p>
@@ -399,18 +419,18 @@ the <code>Cons</code> variant looks like now:</p>
 pointer? -->
 <!-- We're trying to introduce the reader to smart pointers by introducing the
 simplest one first. We've reworded to hopefully address this. /Carol -->
-<p>Boxes only provide the indirection and heap allocation; they don't have any
-other special abilities like those we'll see with the other smart pointer
-types. They also don't have any performance overhead that these special
+<p>Boxes only provide the indirection and heap allocation; they don’t have any
+other special abilities like those we’ll see with the other smart pointer
+types. They also don’t have any performance overhead that these special
 abilities incur, so they can be useful in cases like the cons list where the
-indirection is the only feature we need. We'll look at more use cases for boxes
+indirection is the only feature we need. We’ll look at more use cases for boxes
 in Chapter 17, too.</p>
 <p>The <code>Box&lt;T&gt;</code> type is a smart pointer because it implements the <code>Deref</code> trait,
 which allows <code>Box&lt;T&gt;</code> values to be treated like references. When a <code>Box&lt;T&gt;</code>
 value goes out of scope, the heap data that the box is pointing to is cleaned
-up as well because of the <code>Box&lt;T&gt;</code> type's <code>Drop</code> trait implementation. Let's
+up as well because of the <code>Box&lt;T&gt;</code> type’s <code>Drop</code> trait implementation. Let’s
 explore these two types in more detail; these traits are going to be even more
-important to the functionality provided by the other smart pointer types we'll
+important to the functionality provided by the other smart pointer types we’ll
 be discussing in the rest of this chapter.</p>
 <!-- so deref and drop are features of Box and not of smart pointers? Or of
 both? I'm not sure it's clear -->
@@ -423,13 +443,13 @@ smart pointers /Carol -->
 
                 <!-- Mobile navigation buttons -->
                 
-                    <a href="ch15-00-smart-pointers.html" class="mobile-nav-chapters previous">
+                    <a rel="prev" href="ch15-00-smart-pointers.html" class="mobile-nav-chapters previous">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a href="ch15-02-deref.html" class="mobile-nav-chapters next">
+                    <a rel="next" href="ch15-02-deref.html" class="mobile-nav-chapters next">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -461,8 +481,11 @@ smart pointers /Carol -->
         <!-- Livereload script (if served using the cli tool) -->
         
 
+        
+
+        
+
         <script src="highlight.js"></script>
-        <script src="store.js"></script>
         <script src="book.js"></script>
     </body>
 </html>

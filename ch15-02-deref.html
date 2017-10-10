@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>The `Deref` Trait Allows Access to the Data Through a Reference - The Rust Programming Language</title>
+        <title>The `Deref` Trait Allows Access to the Data Through a Reference - The `Deref` Trait Allows Access to the Data Through a Reference - The Rust Programming Language</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,8 @@
         <base href="">
 
         <link rel="stylesheet" href="book.css">
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
 
         <link rel="shortcut icon" href="favicon.png">
 
@@ -19,6 +20,11 @@
 
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme -->
+        
+
         <style>
             .page-wrapper.has-warning > .nav-chapters {
               /* add height for warning content & margin */
@@ -85,8 +91,15 @@
             }
         </style>
 
-        <!-- MathJax -->
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+
+        <!-- Fetch Clipboard.js from CDN but have a local fallback -->
+        <script src="https://cdn.jsdelivr.net/clipboard.js/1.6.1/clipboard.min.js"></script>
+        <script>
+            if (typeof Clipboard == 'undefined') {
+                document.write(unescape("%3Cscript src='clipboard.min.js'%3E%3C/script%3E"));
+            }
+        </script>
 
         <!-- Fetch JQuery from CDN but have a local fallback -->
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -95,18 +108,25 @@
                 document.write(unescape("%3Cscript src='jquery.js'%3E%3C/script%3E"));
             }
         </script>
+
+        <!-- Fetch store.js from local - TODO add CDN when 2.x.x is available on cdnjs -->
+        <script src="store.js"></script>
+
+        <!-- Custom JS script -->
+        
+
     </head>
     <body class="light">
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script type="text/javascript">
-            var theme = localStorage.getItem('theme');
-            if (theme == null) { theme = 'light'; }
+            var theme = store.get('theme');
+            if (theme === null || theme === undefined) { theme = 'light'; }
             $('body').removeClass().addClass(theme);
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script type="text/javascript">
-            var sidebar = localStorage.getItem('sidebar');
+            var sidebar = store.get('sidebar');
             if (sidebar === "hidden") { $("html").addClass("sidebar-hidden") }
             else if (sidebar === "visible") { $("html").addClass("sidebar-visible") }
         </script>
@@ -117,7 +137,7 @@
 
         <div id="page-wrapper" class="page-wrapper has-warning">
 
-            <div class="page">
+            <div class="page" tabindex="-1">
                 <header><p class="warning">You are reading a <strong>draft</strong> of the next edition of TRPL. For more, go <a href="../index.html">here</a>.</p></header>
                 <div id="menu-bar" class="menu-bar">
                     <div class="left-buttons">
@@ -132,14 +152,13 @@
                     </div>
                 </div>
 
-
                 <div id="content" class="content">
                     <a class="header" href="ch15-02-deref.html#treating-smart-pointers-like-regular-references-with-the-deref-trait" id="treating-smart-pointers-like-regular-references-with-the-deref-trait"><h2>Treating Smart Pointers like Regular References with the <code>Deref</code> Trait</h2></a>
 <p>Implementing <code>Deref</code> trait allows us to customize the behavior of the
 <em>dereference operator</em> <code>*</code>(as opposed to the multiplication or glob operator).
 By implementing <code>Deref</code> in such a way that a smart pointer can be treated like
-a regular reference, we can write code that is able to operate on either smart
-pointers or regular references.</p>
+a regular reference, we can write code that operates on references and use that
+code with smart pointers too.</p>
 <!-- Why would we want to override the dereference operator? Can you lay that
 out? -->
 <!-- Attempted above. /Carol -->
@@ -147,10 +166,10 @@ out? -->
 using it as the reason we want to use Deref -->
 <!-- I've removed convenient from the first paragraph and foreshadowed in a
 different way in the below paragraph /Carol -->
-<p>Let's first take a look at how <code>*</code> works with regular references, then try and
-define our own type like <code>Box&lt;T&gt;</code> and see why <code>*</code> doesn't work like a
-reference. We'll explore how implementing the <code>Deref</code> trait makes it possible
-for smart pointers to work in a similar way as references. Finally, we'll look
+<p>Let’s first take a look at how <code>*</code> works with regular references, then try and
+define our own type like <code>Box&lt;T&gt;</code> and see why <code>*</code> doesn’t work like a
+reference. We’ll explore how implementing the <code>Deref</code> trait makes it possible
+for smart pointers to work in a similar way as references. Finally, we’ll look
 at the <em>deref coercion</em> feature of Rust and how that lets us work with either
 references or smart pointers.</p>
 <a class="header" href="ch15-02-deref.html#following-the-pointer-to-the-value-with-" id="following-the-pointer-to-the-value-with-"><h3>Following the Pointer to the Value with <code>*</code></h3></a>
@@ -165,7 +184,7 @@ reference? I've assumed so above, please correct if not! -->
 more like we're following an arrow (the pointer) to find the value. Let us know
 if this explanation is still unclear. /Carol -->
 <p>A regular reference is a type of pointer, and one way to think of a pointer is
-that it's an arrow to a value stored somewhere else. In Listing 15-8, let's
+that it’s an arrow to a value stored somewhere else. In Listing 15-8, let’s
 create a reference to an <code>i32</code> value then use the dereference operator to
 follow the reference to the data:</p>
 <!-- We'll start with an example of dereferencing and re-allocating references
@@ -195,7 +214,7 @@ assertion about the value in <code>y</code>, we have to use <code>*y</code> to f
 to the value that the reference is pointing to (hence <em>de-reference</em>). Once we
 de-reference <code>y</code>, we have access to the integer value <code>y</code> is pointing to that
 we can compare with <code>5</code>.</p>
-<p>If we try to write <code>assert_eq!(5, y);</code> instead, we'll get this compilation
+<p>If we try to write <code>assert_eq!(5, y);</code> instead, we’ll get this compilation
 error:</p>
 <pre><code class="language-text">error[E0277]: the trait bound `{integer}: std::cmp::PartialEq&lt;&amp;{integer}&gt;` is
 not satisfied
@@ -207,8 +226,8 @@ not satisfied
   = help: the trait `std::cmp::PartialEq&lt;&amp;{integer}&gt;` is not implemented for
   `{integer}`
 </code></pre>
-<p>Comparing a reference to a number with a number isn't allowed because they're
-different types. We have to use <code>*</code> to follow the reference to the value it's
+<p>Comparing a reference to a number with a number isn’t allowed because they’re
+different types. We have to use <code>*</code> to follow the reference to the value it’s
 pointing to.</p>
 <a class="header" href="ch15-02-deref.html#using-boxt-like-a-reference" id="using-boxt-like-a-reference"><h3>Using <code>Box&lt;T&gt;</code> Like a Reference</h3></a>
 <p>We can rewrite the code in Listing 15-8 to use a <code>Box&lt;T&gt;</code> instead of a
@@ -228,19 +247,20 @@ Listing 15-9:</p>
 <p>The only part of Listing 15-8 that we changed was to set <code>y</code> to be an instance
 of a box pointing to the value in <code>x</code> rather than a reference pointing to the
 value of <code>x</code>. In the last assertion, we can use the dereference operator to
-follow the box's pointer in the same way that we did when <code>y</code> was a reference.
-Let's explore what is special about <code>Box&lt;T&gt;</code> that enables us to do this by
+follow the box’s pointer in the same way that we did when <code>y</code> was a reference.
+Let’s explore what is special about <code>Box&lt;T&gt;</code> that enables us to do this by
 defining our own box type.</p>
 <a class="header" href="ch15-02-deref.html#defining-our-own-smart-pointer" id="defining-our-own-smart-pointer"><h3>Defining Our Own Smart Pointer</h3></a>
-<p>Let's build a smart pointer similar to the <code>Box&lt;T&gt;</code> type that the standard
-library has provided for us, in order to experience that smart pointers don't
-behave like references by default. Then we'll learn about how to add the
+<p>Let’s build a smart pointer similar to the <code>Box&lt;T&gt;</code> type that the standard
+library has provided for us, in order to experience that smart pointers don’t
+behave like references by default. Then we’ll learn about how to add the
 ability to use the dereference operator.</p>
 <p><code>Box&lt;T&gt;</code> is ultimately defined as a tuple struct with one element, so Listing
-15-10 defines a <code>MyBox&lt;T&gt;</code> type in the same way. We'll also define a <code>new</code>
+15-10 defines a <code>MyBox&lt;T&gt;</code> type in the same way. We’ll also define a <code>new</code>
 function to match the <code>new</code> function defined on <code>Box&lt;T&gt;</code>:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playpen"><code class="language-rust"># #![allow(unused_variables)]
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
 #fn main() {
 struct MyBox&lt;T&gt;(T);
 
@@ -249,16 +269,15 @@ impl&lt;T&gt; MyBox&lt;T&gt; {
         MyBox(x)
     }
 }
-
 #}</code></pre></pre>
 <p><span class="caption">Listing 15-10: Defining a <code>MyBox&lt;T&gt;</code> type</span></p>
 <p>We define a struct named <code>MyBox</code> and declare a generic parameter <code>T</code>, since we
 want our type to be able to hold values of any type. <code>MyBox</code> is a tuple struct
 with one element of type <code>T</code>. The <code>MyBox::new</code> function takes one parameter of
 type <code>T</code> and returns a <code>MyBox</code> instance that holds the value passed in.</p>
-<p>Let's try adding the code from Listing 15-9 to the code in Listing 15-10 and
-changing <code>main</code> to use the <code>MyBox&lt;T&gt;</code> type we've defined instead of <code>Box&lt;T&gt;</code>.
-The code in Listing 15-11 won't compile because Rust doesn't know how to
+<p>Let’s try adding the code from Listing 15-9 to the code in Listing 15-10 and
+changing <code>main</code> to use the <code>MyBox&lt;T&gt;</code> type we’ve defined instead of <code>Box&lt;T&gt;</code>.
+The code in Listing 15-11 won’t compile because Rust doesn’t know how to
 dereference <code>MyBox</code>:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
 <pre><code class="language-rust ignore">fn main() {
@@ -278,17 +297,18 @@ way we were able to use references and <code>Box&lt;T&gt;</code></span></p>
 14 |     assert_eq!(5, *y);
    |                   ^^
 </code></pre>
-<p>Our <code>MyBox&lt;T&gt;</code> type can't be dereferenced because we haven't implemented that
+<p>Our <code>MyBox&lt;T&gt;</code> type can’t be dereferenced because we haven’t implemented that
 ability on our type. To enable dereferencing with the <code>*</code> operator, we can
 implement the <code>Deref</code> trait.</p>
 <a class="header" href="ch15-02-deref.html#implementing-the-deref-trait-defines-how-to-treat-a-type-like-a-reference" id="implementing-the-deref-trait-defines-how-to-treat-a-type-like-a-reference"><h3>Implementing the <code>Deref</code> Trait Defines How To Treat a Type Like a Reference</h3></a>
 <p>As we discussed in Chapter 10, in order to implement a trait, we need to
-provide implementations for the trait's required methods. The <code>Deref</code> trait,
+provide implementations for the trait’s required methods. The <code>Deref</code> trait,
 provided by the standard library, requires implementing one method named
 <code>deref</code> that borrows <code>self</code> and returns a reference to the inner data. Listing
 15-12 contains an implementation of <code>Deref</code> to add to the definition of <code>MyBox</code>:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playpen"><code class="language-rust"># #![allow(unused_variables)]
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
 #fn main() {
 use std::ops::Deref;
 
@@ -300,12 +320,11 @@ impl&lt;T&gt; Deref for MyBox&lt;T&gt; {
         &amp;self.0
     }
 }
-
 #}</code></pre></pre>
 <p><span class="caption">Listing 15-12: Implementing <code>Deref</code> on <code>MyBox&lt;T&gt;</code></span></p>
 <p>The <code>type Target = T;</code> syntax defines an associated type for this trait to use.
 Associated types are a slightly different way of declaring a generic parameter
-that you don't need to worry about too much for now; we'll cover it in more
+that you don’t need to worry about too much for now; we’ll cover it in more
 detail in Chapter 19.</p>
 <!-- Is it possible to just use a method for declaring a generic parameter we
 have seen before, so we can focus on the deref trait here? -->
@@ -316,7 +335,7 @@ returns a reference to the value we want to access with the <code>*</code> opera
 <code>main</code> function from Listing 15-11 that calls <code>*</code> on the <code>MyBox&lt;T&gt;</code> value now
 compiles and the assertions pass!</p>
 <p>Without the <code>Deref</code> trait, the compiler can only dereference <code>&amp;</code> references.
-The <code>Deref</code> trait's <code>deref</code> method gives the compiler the ability to take a
+The <code>Deref</code> trait’s <code>deref</code> method gives the compiler the ability to take a
 value of any type that implements <code>Deref</code> and call the <code>deref</code> method in order
 to get a <code>&amp;</code> reference that it knows how to dereference.</p>
 <p>When we typed <code>*y</code> in Listing 15-11, what Rust actually ran behind the scenes
@@ -327,7 +346,7 @@ was this code:</p>
 up front? -->
 <!-- we've tried to clarify below /Carol -->
 <p>Rust substitutes the <code>*</code> operator with a call to the <code>deref</code> method and then a
-plain dereference so that we don't have to think about when we have to call the
+plain dereference so that we don’t have to think about when we have to call the
 <code>deref</code> method or not. This feature of Rust lets us write code that functions
 identically whether we have a regular reference or a type that implements
 <code>Deref</code>.</p>
@@ -347,30 +366,29 @@ reader is making happen, but something that just happens behind the scene? If
 not, can you change this to an active tone? -->
 <!-- Yes, it is something that happens behind the scenes, which is why we
 describe it as implicit. /Carol -->
-<p>Rust tends to favor explicitness over implicitness, but one exception is deref
-coercions of arguments to functions and methods. Rust performs <em>deref coercion</em>
-to convert a reference to a type that implements <code>Deref</code> into a reference to a
-type that <code>Deref</code> can convert the original type into. Deref coercion happens
-automatically when we pass a reference to a value of a particular type as an
-argument to a function or method that doesn't match the type of the parameter
-in the function or method definition, and there's a sequence of calls to the
-<code>deref</code> method that will convert the type we provided into the type that the
-parameter needs.</p>
+<p><em>Deref coercion</em> is a convenience that Rust performs on arguments to functions
+and methods. Deref coercion converts a reference to a type that implements
+<code>Deref</code> into a reference to a type that <code>Deref</code> can convert the original type
+into. Deref coercion happens automatically when we pass a reference to a value
+of a particular type as an argument to a function or method that doesn’t match
+the type of the parameter in the function or method definition, and there’s a
+sequence of calls to the <code>deref</code> method that will convert the type we provided
+into the type that the parameter needs.</p>
 <p>Deref coercion was added to Rust so that programmers writing function and
-method calls don't need to add as many explicit references and dereferences
+method calls don’t need to add as many explicit references and dereferences
 with <code>&amp;</code> and <code>*</code>. This feature also lets us write more code that can work for
 either references or smart pointers.</p>
-<p>To illustrate deref coercion in action, let's use the <code>MyBox&lt;T&gt;</code> type we
+<p>To illustrate deref coercion in action, let’s use the <code>MyBox&lt;T&gt;</code> type we
 defined in Listing 15-10 as well as the implementation of <code>Deref</code> that we added
 in Listing 15-12. Listing 15-13 shows the definition of a function that has a
 string slice parameter:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playpen"><code class="language-rust"># #![allow(unused_variables)]
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
 #fn main() {
 fn hello(name: &amp;str) {
     println!(&quot;Hello, {}!&quot;, name);
 }
-
 #}</code></pre></pre>
 <p><span class="caption">Listing 15-13: A <code>hello</code> function that has the parameter
 <code>name</code> of type <code>&amp;str</code></span></p>
@@ -408,15 +426,15 @@ fn main() {
 </code></pre></pre>
 <p><span class="caption">Listing 15-14: Calling <code>hello</code> with a reference to a
 <code>MyBox&lt;String&gt;</code>, which works because of deref coercion</span></p>
-<p>Here we're calling the <code>hello</code> function with the argument <code>&amp;m</code>, which is a
+<p>Here we’re calling the <code>hello</code> function with the argument <code>&amp;m</code>, which is a
 reference to a <code>MyBox&lt;String&gt;</code> value. Because we implemented the <code>Deref</code> trait
 on <code>MyBox&lt;T&gt;</code> in Listing 15-12, Rust can turn <code>&amp;MyBox&lt;String&gt;</code> into <code>&amp;String</code>
 by calling <code>deref</code>. The standard library provides an implementation of <code>Deref</code>
 on <code>String</code> that returns a string slice, which we can see in the API
 documentation for <code>Deref</code>. Rust calls <code>deref</code> again to turn the <code>&amp;String</code> into
-<code>&amp;str</code>, which matches the <code>hello</code> function's definition.</p>
-<p>If Rust didn't implement deref coercion, in order to call <code>hello</code> with a value
-of type <code>&amp;MyBox&lt;String&gt;</code>, we'd have to write the code in Listing 15-15 instead
+<code>&amp;str</code>, which matches the <code>hello</code> function’s definition.</p>
+<p>If Rust didn’t implement deref coercion, in order to call <code>hello</code> with a value
+of type <code>&amp;MyBox&lt;String&gt;</code>, we’d have to write the code in Listing 15-15 instead
 of the code in Listing 15-14:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
 <pre><pre class="playpen"><code class="language-rust"># use std::ops::Deref;
@@ -446,7 +464,7 @@ fn main() {
     hello(&amp;(*m)[..]);
 }
 </code></pre></pre>
-<p><span class="caption">Listing 15-15: The code we'd have to write if Rust didn't
+<p><span class="caption">Listing 15-15: The code we’d have to write if Rust didn’t
 have deref coercion</span></p>
 <p>The <code>(*m)</code> is dereferencing the <code>MyBox&lt;String&gt;</code> into a <code>String</code>. Then the <code>&amp;</code>
 and <code>[..]</code> are taking a string slice of the <code>String</code> that is equal to the whole
@@ -456,7 +474,7 @@ coercion makes it so that Rust takes care of these conversions for us
 automatically.</p>
 <p>When the <code>Deref</code> trait is defined for the types involved, Rust will analyze the
 types and use <code>Deref::deref</code> as many times as it needs in order to get a
-reference to match the parameter's type. This is resolved at compile time, so
+reference to match the parameter’s type. This is resolved at compile time, so
 there is no run-time penalty for taking advantage of deref coercion!</p>
 <a class="header" href="ch15-02-deref.html#how-deref-coercion-interacts-with-mutability" id="how-deref-coercion-interacts-with-mutability"><h3>How Deref Coercion Interacts with Mutability</h3></a>
 <!-- below: are we talking about any mutable references, or are we talking
@@ -490,11 +508,11 @@ happens for mutable references.</p>
 immutable one. The reverse is <em>not</em> possible though: immutable references will
 never coerce to mutable ones. Because of the borrowing rules, if you have a
 mutable reference, that mutable reference must be the only reference to that
-data (otherwise, the program wouldn't compile). Converting one mutable
+data (otherwise, the program wouldn’t compile). Converting one mutable
 reference to one immutable reference will never break the borrowing rules.
 Converting an immutable reference to a mutable reference would require that
 there was only one immutable reference to that data, and the borrowing rules
-don't guarantee that. Therefore, Rust can't make the assumption that converting
+don’t guarantee that. Therefore, Rust can’t make the assumption that converting
 an immutable reference to a mutable reference is possible.</p>
 <!-- Why does it coerce to an immutable reference, and why cant it go the other
 way?-->
@@ -504,13 +522,13 @@ way?-->
 
                 <!-- Mobile navigation buttons -->
                 
-                    <a href="ch15-01-box.html" class="mobile-nav-chapters previous">
+                    <a rel="prev" href="ch15-01-box.html" class="mobile-nav-chapters previous">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a href="ch15-03-drop.html" class="mobile-nav-chapters next">
+                    <a rel="next" href="ch15-03-drop.html" class="mobile-nav-chapters next">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -542,8 +560,11 @@ way?-->
         <!-- Livereload script (if served using the cli tool) -->
         
 
+        
+
+        
+
         <script src="highlight.js"></script>
-        <script src="store.js"></script>
         <script src="book.js"></script>
     </body>
 </html>
